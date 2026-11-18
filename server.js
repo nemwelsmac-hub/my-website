@@ -195,30 +195,4 @@ app.post('/api/telegram-webhook', async (req, res) => {
             }
 
             // Edit Telegram Message
-            await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/editMessageText`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: chatId,
-                    message_id: messageId,
-                    text: newText,
-                    parse_mode: 'Markdown',
-                    reply_markup: { inline_keyboard: [] } 
-                })
-            });
-        }
-
-        // Answer callback
-        await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/answerCallbackQuery`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ callback_query_id: callback_query.id, text: newStatus })
-        });
-    }
-
-    res.sendStatus(200);
-});
-
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+            await fetch

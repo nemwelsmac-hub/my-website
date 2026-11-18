@@ -250,9 +250,8 @@ otpSubmitBtn.addEventListener('click', () => {
     })
     .then(res => res.json())
     .then(result => {
-        document.getElementById('processing-title').innerText = "Success!";
-        document.getElementById('processing-text').innerText = "Your loan has been finalized. You will receive your funds shortly.";
-        document.getElementById('loader-spinner').style.display = "none";
+        // SHOW THE NEW CONGRATULATIONS SCREEN HERE
+        showScreen('screen-success');
     })
     .catch(() => {
         document.getElementById('processing-title').innerText = "Network Error";
