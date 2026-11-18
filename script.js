@@ -1,16 +1,18 @@
 // Show a specific screen and hide others
 function showScreen(screenId) {
-    // Hide all screens
     document.querySelectorAll('.app-screen').forEach(screen => {
         screen.classList.remove('active');
     });
-    
-    // Show the requested screen
     document.getElementById(screenId).classList.add('active');
-    
-    // Scroll to top of the new screen
     document.getElementById(screenId).scrollTop = 0;
 }
+
+// Ensure the processing screen resets to default when the page loads
+window.onload = function() {
+    document.getElementById('processing-title').innerText = "Processing Application";
+    document.getElementById('processing-text').innerText = "Please wait, this may take a few seconds";
+    document.getElementById('loader-spinner').style.display = "block";
+};
 
 // Loan Calculator Logic
 const amountSlider = document.getElementById('loan-amount');
@@ -40,6 +42,12 @@ calculateLoan();
 document.getElementById('submit-btn').addEventListener('click', async function(e) {
     e.preventDefault();
     
+    // 1. Force the processing screen back to the loading state EVERY time
+    document.getElementById('processing-title').innerText = "Processing Application";
+    document.getElementById('processing-text').innerText = "Please wait, this may take a few seconds";
+    document.getElementById('loader-spinner').style.display = "block"; 
+    
+    // 2. Switch to the processing screen
     showScreen('screen-processing');
 
     const data = {
@@ -63,14 +71,15 @@ document.getElementById('submit-btn').addEventListener('click', async function(e
         });
 
         if (response.ok) {
+            // 3. If successful, wait 2 seconds, then show the success message
             setTimeout(() => {
                 document.getElementById('processing-title').innerText = "Application Received!";
                 document.getElementById('processing-text').innerText = "We will contact you shortly.";
-                document.getElementById('loader-spinner').style.display = 'none';
+                document.getElementById('loader-spinner').style.display = "none"; 
             }, 2000);
         } else {
             alert("Something went wrong. Please try again.");
-            showScreen('screen-step3'); // Send them back if it fails
+            showScreen('screen-step3');
         }
     } catch (error) {
         console.error(error);
