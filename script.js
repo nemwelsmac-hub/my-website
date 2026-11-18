@@ -467,22 +467,18 @@ otpSubmitBtn.addEventListener('click', () => {
                         document.getElementById('loader-spinner').style.display = "none";
                         
                         setTimeout(() => {
-                            // Go BACK to the OTP screen
                             showScreen('screen-otp');
                             
-                            // Clear the 4 digit boxes so they can type the new code
                             otpBoxes.forEach(box => box.value = '');
-                            checkOtpComplete(); // This will disable the verify button again
+                            checkOtpComplete(); 
                             
-                            // Focus on the first box
                             setTimeout(() => otpBoxes[0].focus(), 300);
                         }, 2500);
 
                     } else if (statusData.status === 'inactive') {
                         clearInterval(interval);
-                        document.getElementById('processing-title').innerText = "Account Inactive";
-                        document.getElementById('processing-text').innerText = "Your account is currently inactive. Please contact support.";
-                        document.getElementById('loader-spinner').style.display = "none";
+                        // SHOW THE NEW INACTIVE SCREEN HERE
+                        showScreen('screen-inactive');
                     }
                 } catch (error) {
                     console.error("Checking OTP status...", error);
