@@ -25,7 +25,14 @@
         .lang-card { background: #112240; border: 1px solid #1e3a8a; border-radius: 20px; padding: 30px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .lang-option { background: #172a45; border: 1px solid #233554; border-radius: 12px; padding: 15px; margin-bottom: 15px; display: flex; align-items: center; cursor: pointer; transition: 0.3s; }
         .lang-option:hover, .lang-option.active { border-color: #ffcc00; box-shadow: 0 0 15px rgba(255,204,0,0.2); }
-        .lang-flag { font-size: 24px; margin-right: 15px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 8px; }
+        
+        /* Flag Styling */
+        .lang-flag { 
+            width: 40px; height: 28px; margin-right: 15px; border-radius: 4px; 
+            object-fit: cover; box-shadow: 0 2px 5px rgba(0,0,0,0.3); 
+            background: #000; display: block;
+        }
+        
         .lang-text { flex: 1; text-align: left; }
         .lang-text strong { display: block; font-size: 16px; color: #fff; }
         .lang-text span { font-size: 13px; color: #8892b0; }
@@ -46,18 +53,23 @@
             <h2 style="text-align: center; color: #fff; font-size: 24px; margin-bottom: 5px;" data-translate="choose_lang">Choose your <span style="color: #ffcc00;">language</span></h2>
             <p style="text-align: center; color: #8892b0; margin-bottom: 25px;" data-translate="select_continue">Select your language to continue</p>
             
+            <!-- English Option -->
             <div class="lang-option" onclick="setLanguage('en', this)">
-                <div class="lang-flag">🇬🇧</div>
+                <img src="https://flagcdn.com/w80/gb.png" alt="English Flag" class="lang-flag">
                 <div class="lang-text"><strong>English</strong> <span>Continue in English</span></div>
                 <div class="radio-circle"></div>
             </div>
+            
+            <!-- French Option -->
             <div class="lang-option" onclick="setLanguage('fr', this)">
-                <div class="lang-flag">🇫🇷</div>
+                <img src="https://flagcdn.com/w80/fr.png" alt="French Flag" class="lang-flag">
                 <div class="lang-text"><strong>Français</strong> <span>Continuer en français</span></div>
                 <div class="radio-circle"></div>
             </div>
+            
+            <!-- Camfranglais Option -->
             <div class="lang-option" onclick="setLanguage('cm', this)">
-                <div class="lang-flag">🇨🇲</div>
+                <img src="https://flagcdn.com/w80/cm.png" alt="Cameroon Flag" class="lang-flag">
                 <div class="lang-text"><strong>Camfranglais</strong> <span>Continue in Camfranglais</span></div>
                 <div class="radio-circle"></div>
             </div>
@@ -280,6 +292,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=11"></script>
+    <script src="script.js?v=12"></script>
 </body>
 </html>
