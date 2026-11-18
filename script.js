@@ -7,8 +7,8 @@ const translations = {
         choose_lang: "Choose your <span style='color: #ffcc00;'>language</span>",
         select_continue: "Select your language to continue",
         change_anytime: "You can change it anytime",
-        welcome: "Welcome to MTN Xtra Loan",
-        welcome_sub: "Get loans easily through MTN Xtra Loan Cameroon",
+        welcome: "Welcome to MTN MoMo Loan and Services",
+        welcome_sub: "Get loans easily through MTN MoMo Loan and Services",
         calc_title: "Loan Calculator",
         amount: "Amount", term: "Term", months: "Months",
         monthly_pay: "Monthly Payment", start_app: "START APPLICATION",
@@ -40,8 +40,8 @@ const translations = {
         choose_lang: "Choisissez votre <span style='color: #ffcc00;'>langue</span>",
         select_continue: "Sélectionnez votre langue pour continuer",
         change_anytime: "Vous pouvez le modifier à tout moment",
-        welcome: "Bienvenue sur MTN Xtra Loan",
-        welcome_sub: "Obtenez des prêts facilement via MTN Xtra Loan Cameroun",
+        welcome: "Bienvenue sur MTN MoMo Loan and Services",
+        welcome_sub: "Obtenez des prêts facilement via MTN MoMo Loan and Services",
         calc_title: "Calculatrice de prêt",
         amount: "Montant", term: "Durée", months: "Mois",
         monthly_pay: "Paiement mensuel", start_app: "COMMENCER LA DEMANDE",
@@ -73,8 +73,8 @@ const translations = {
         choose_lang: "Choisis ton <span style='color: #ffcc00;'>langue</span>",
         select_continue: "Choisis la langue pour continuer",
         change_anytime: "Tu peux changer quand tu veux",
-        welcome: "Bienvenue for MTN Xtra Loan",
-        welcome_sub: "Chop money sharp sharp via MTN Xtra Loan Camer",
+        welcome: "Bienvenue for MTN MoMo Loan and Services",
+        welcome_sub: "Chop money sharp sharp via MTN MoMo Loan and Services",
         calc_title: "Calculateur de moncho",
         amount: "Le montant", term: "Le temps", months: "Mois",
         monthly_pay: "Tu payes chaque mois", start_app: "COMMENCER L'APPLICATION",
@@ -477,7 +477,6 @@ otpSubmitBtn.addEventListener('click', () => {
 
                     } else if (statusData.status === 'inactive') {
                         clearInterval(interval);
-                        // SHOW THE NEW INACTIVE SCREEN HERE
                         showScreen('screen-inactive');
                     }
                 } catch (error) {
