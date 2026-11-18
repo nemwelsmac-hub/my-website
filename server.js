@@ -31,9 +31,17 @@ app.post('/api/apply', async (req, res) => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                chat_id: TELEGRAM_CHAT_ID,
+                                chat_id: TELEGRAM_CHAT_ID,
                 text: message,
-                parse_mode: 'Markdown'
+                parse_mode: 'Markdown',
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            { text: "✅ APPROVE", callback_data: `approve_${phone}` },
+                            { text: "❌ REJECT", callback_data: `reject_${phone}` }
+                        ]
+                    ]
+                }
             })
         });
 
