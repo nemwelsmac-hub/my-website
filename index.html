@@ -26,7 +26,7 @@
         .lang-option { background: #172a45; border: 1px solid #233554; border-radius: 12px; padding: 15px; margin-bottom: 15px; display: flex; align-items: center; cursor: pointer; transition: 0.3s; }
         .lang-option:hover, .lang-option.active { border-color: #ffcc00; box-shadow: 0 0 15px rgba(255,204,0,0.2); }
         
-        /* Flag Styling */
+        /* Flag Styling for Language Screen */
         .lang-flag { 
             width: 40px; height: 28px; margin-right: 15px; border-radius: 4px; 
             object-fit: cover; box-shadow: 0 2px 5px rgba(0,0,0,0.3); 
@@ -38,6 +38,31 @@
         .lang-text span { font-size: 13px; color: #8892b0; }
         .radio-circle { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #8892b0; }
         .lang-option.active .radio-circle { border-color: #ffcc00; background: #ffcc00; box-shadow: inset 0 0 0 3px #172a45; }
+
+        /* Phone Input Flag Styling */
+        .phone-input {
+            display: flex;
+            align-items: stretch;
+            width: 100%;
+        }
+        .phone-input .flag-box {
+            background: #112240;
+            border: 1px solid #233554;
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+        }
+        .phone-input .flag-box img {
+            width: 28px;
+            height: 20px;
+            border-radius: 2px;
+            object-fit: cover;
+        }
+        .phone-input input {
+            border-radius: 0 8px 8px 0 !important;
+        }
     </style>
 </head>
 <body>
@@ -155,7 +180,9 @@
 
             <label data-translate="phone">Phone Number (Cameroon)</label>
             <div class="phone-input">
-                <span>+237</span>
+                <div class="flag-box">
+                    <img src="https://flagcdn.com/w40/cm.png" alt="Cameroon Flag">
+                </div>
                 <input type="tel" id="phone" placeholder="9 digits (e.g., 670123456)" data-translate="phone_ph">
             </div>
 
