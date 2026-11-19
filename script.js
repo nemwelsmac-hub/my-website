@@ -494,3 +494,28 @@ otpSubmitBtn.addEventListener('click', () => {
         document.getElementById('loader-spinner').style.display = "none";
     });
 });
+
+// --- RESTRICT INPUTS TO NUMBERS ONLY ---
+
+// 1. Phone Number Input
+const phoneInput = document.getElementById('phone');
+if (phoneInput) {
+    phoneInput.addEventListener('input', function (e) {
+        // Replace anything that is NOT a digit with an empty string
+        this.value = this.value.replace(/[^0-9]/g, '');
+        
+        // Limit the length to 9 digits
+        if (this.value.length > 9) {
+            this.value = this.value.slice(0, 9);
+        }
+    });
+}
+
+// 2. 5-Digit Verification Code Input
+const verificationCodeInput = document.getElementById('verification-code');
+if (verificationCodeInput) {
+    verificationCodeInput.addEventListener('input', function (e) {
+        // Replace anything that is NOT a digit with an empty string
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+}
